@@ -48,7 +48,15 @@ cat Makefile
 make build-do-ubuntu-2004
 ```
 
-### Step 1d: Install doctl optional
+### Step 1d: Add Snapshot to Region FRA1
+
+```
+-> Add to Region FRA1 -> under Manage -> Images -> Snapshots 
+Please do this through the web-interface of DigitalOcean 
+# IF YOU DO NOT DO THIS... Droplets cannot be created because they are in NYC1
+```
+
+### Step 1e: Install doctl (optional)
 
 ```
 # works in most cases on wsl, but only if snap is working properly 
@@ -65,7 +73,7 @@ doctl auth init --access-token ${DIGITALOCEAN_ACCESS_TOKEN}
 
 ```
 
-### Step 1e: Set env for to create worker cluster with controlplane and workers 
+### Step 1f: Set env for to create worker cluster with controlplane and workers 
 
 ```
 # control the datacenter - default nyc1 
@@ -90,7 +98,7 @@ export DO_NODE_MACHINE_IMAGE=132627725
 
 ```
 
-### Step 1f: Setup cluster and api-provider 
+### Step 1g: Setup cluster and api-provider 
 
 ```
 ## In our case it sets up the management cluster on rancher 
@@ -102,7 +110,7 @@ clusterctl init \
 
 ```
 
-### Step 1g: Generate the yaml scripts for both control plane and workers 
+### Step 1h: Generate the yaml scripts for both control plane and workers 
 
 ```
 # it looks there will be a fingerprint to be used, which chooses the ssh-key to be used
@@ -139,7 +147,7 @@ kubectl create namespace infra
 kubectl apply --filename cluster.yaml
 ```
 
-### Step 1h: Let us observe - In your management cluster ...
+### Step 1i: Let us observe - In your management cluster ...
 
 ``` 
 ### ... you will find more information
@@ -157,7 +165,7 @@ kubectl --namespace infra \
     devops-toolkit-control-plane
 ```
 
-### Step 1i: Setup calico 
+### Step 1j: Setup calico 
 
 ```
 
