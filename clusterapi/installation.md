@@ -74,6 +74,7 @@ export DO_REGION=fra1
 # default 1vcpu-1gb 
 export DO_CONTROL_PLANE_MACHINE_TYPE=s-2vcpu-2gb
 export DO_NODE_MACHINE_TYPE=s-2vcpu-2gb
+# needed to set up the api provider 
 export DO_B64ENCODED_CREDENTIALS="$(\
     echo -n "$DIGITALOCEAN_ACCESS_TOKEN" \
     | base64 \
@@ -86,5 +87,15 @@ doctl compute image list-user
 
 export DO_CONTROL_PLANE_MACHINE_IMAGE=132627725
 export DO_NODE_MACHINE_IMAGE=132627725
+
+```
+
+### Step 1f: Setup cluster and api-provider 
+
+```
+cd ../../../
+
+clusterctl init \
+    --infrastructure digitalocean
 
 ```
