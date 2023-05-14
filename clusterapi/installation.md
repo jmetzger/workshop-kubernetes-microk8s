@@ -93,7 +93,8 @@ export DO_NODE_MACHINE_IMAGE=132627725
 ### Step 1f: Setup cluster and api-provider 
 
 ```
-## In our case it sets up the management cluster on digitalocean 
+## In our case it sets up the management cluster on rancher 
+## to be used for kubernetes 
 cd ../../../
 
 clusterctl init \
@@ -101,3 +102,34 @@ clusterctl init \
 
 ```
 
+### Step 1g: Generate the yaml scripts for both control plane and workers 
+
+```
+# it looks there will be a fingerprint to be used, which chooses the ssh-key to be used
+# to connect to the machines
+# look for all the ssh-key like so:
+doctl compute ssh-key list 
+
+# So we choose one from the list 
+export DO_SSH_KEY_FINGERPRINT=[...]
+
+# Kuberentes must be the same version as you created the snapshots for do
+# to be used for digitalocean -> creating a cluster there
+clusterctl generate cluster devops-toolkit \
+    --infrastructure digitalocean \
+    --target-namespace infra \
+    --kubernetes-version v1.24.11 \
+    --control-plane-machine-count 3 \
+    --worker-machine-count 3 \
+    | tee cluster.yaml
+    
+kubectl create namespace infra
+
+kubectl apply --filename cluster.yaml
+```
+
+### Step 1h: Let us observe
+
+```
+
+```
