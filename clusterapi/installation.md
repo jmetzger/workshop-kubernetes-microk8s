@@ -128,8 +128,20 @@ kubectl create namespace infra
 kubectl apply --filename cluster.yaml
 ```
 
-### Step 1h: Let us observe
+### Step 1h: Let us observe - In your management cluster ...
 
-```
+``` 
+### ... you will find more information
+kubectl --namespace infra \
+    get clusters
 
+kubectl --namespace infra \
+    get machinedeployments
+
+kubectl --namespace infra \
+    get kubeadmcontrolplane
+
+kubectl --namespace infra \
+    describe kubeadmcontrolplane \
+    devops-toolkit-control-plane
 ```
