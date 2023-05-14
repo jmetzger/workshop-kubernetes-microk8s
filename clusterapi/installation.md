@@ -145,3 +145,10 @@ kubectl --namespace infra \
     describe kubeadmcontrolplane \
     devops-toolkit-control-plane
 ```
+
+### Step 1i: Setup calico 
+
+```
+
+
+```
