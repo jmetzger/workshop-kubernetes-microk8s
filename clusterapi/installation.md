@@ -147,27 +147,28 @@ kubectl create namespace infra
 kubectl apply --filename cluster.yaml
 ```
 
-### Step 1i: Let us observe - In your management cluster ...
+### Step 1i: Wait till the control plane is initialized + install calico 
 
+```
+kubectl get kubeadmcontrolplane
+
+# When initialized get kubeconfig and install calicao 
+clusterctl --namespace infra2 \
+    get kubeconfig devops-toolkit \
+    | tee kubeconfig.yaml
+
+
+kubectl --kubeconfig kubeconfig.yaml get ns
+# you will see control plane is not ready because of network missing
+kubectl --kubeconfig kubeconfig.yaml get nodes
+
+kubectl --kubeconfig kubeconfig.yaml apply -f https://docs.projectcalico.org/v3.25/manifests/calico.yaml
+
+```
+
+### Step 1j: READY it is (says Yoda) 
+
+```
+# Wait a while, now you will see, the nodes are ready
+kubectl --kubeconfig kubeconfig.yaml get nodes 
 ``` 
-### ... you will find more information
-kubectl --namespace infra \
-    get clusters
-
-kubectl --namespace infra \
-    get machinedeployments
-
-kubectl --namespace infra \
-    get kubeadmcontrolplane
-
-kubectl --namespace infra \
-    describe kubeadmcontrolplane \
-    devops-toolkit-control-plane
-```
-
-### Step 1j: Setup calico 
-
-```
-
-
-```
