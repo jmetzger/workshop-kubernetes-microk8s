@@ -93,9 +93,11 @@ export DO_NODE_MACHINE_IMAGE=132627725
 ### Step 1f: Setup cluster and api-provider 
 
 ```
+## In our case it sets up the management cluster on digitalocean 
 cd ../../../
 
 clusterctl init \
     --infrastructure digitalocean
 
 ```
+
