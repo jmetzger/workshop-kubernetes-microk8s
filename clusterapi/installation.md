@@ -113,6 +113,17 @@ doctl compute ssh-key list
 # So we choose one from the list 
 export DO_SSH_KEY_FINGERPRINT=[...]
 
+# Check the variables 
+# Show use the necessary env-variables.
+clusterctl generate cluster devops-toolkit \
+    --infrastructure digitalocean \
+    --target-namespace infra \
+    --kubernetes-version v1.24.11 \
+    --control-plane-machine-count 3 \
+    --worker-machine-count 3 \
+    --list-variables 
+
+
 # Kuberentes must be the same version as you created the snapshots for do
 # to be used for digitalocean -> creating a cluster there
 clusterctl generate cluster devops-toolkit \
