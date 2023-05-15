@@ -10,6 +10,12 @@
   1. Installation 
      * [Kubernetes mit der Cluster API aufsetzen](clusterapi/installation.md)
 
+  1. Monitoring with Prometheus / Grafana 
+     * [Overview](prometheus/overview.md)
+     * [Setup prometheus/Grafana with helm](prometheus/walkthrough-installation-setup.md)
+     * [exporters mongodb](prometheus/exporters-and-mongodb.md)
+
+
 ## Backlog 
 
   1. Kubernetes - Misc 
