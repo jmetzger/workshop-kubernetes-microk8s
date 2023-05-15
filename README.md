@@ -15,6 +15,9 @@
      * [Setup prometheus/Grafana with helm](prometheus/walkthrough-installation-setup.md)
      * [exporters mongodb](prometheus/exporters-and-mongodb.md)
 
+  1. Kubernetes Tipps & Tricks 
+     * [kubectl kubeconfig mergen](/kubectl/kubeconfig-mergen.md)
+
 
 ## Backlog 
 
