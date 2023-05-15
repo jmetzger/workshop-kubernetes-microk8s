@@ -7,15 +7,19 @@
      * [Structure Kubernetes Deep Dive](https://github.com/jmetzger/training-kubernetes-advanced/assets/1933318/1ca0d174-f354-43b2-81cc-67af8498b56c)
      * [Ports und Protokolle](https://kubernetes.io/docs/reference/networking/ports-and-protocols/)
      * [kubelet garbage collection](kubelet-garbage-collection.md)
-
   1. Installation 
      * [Kubernetes mit der Cluster API aufsetzen](clusterapi/installation.md)
-
+  1. Kubernetes Praxis API-Objekte 
+     * [Das Tool kubectl (Devs/Ops) - Spickzettel](/kubectl/spickzettel.md)
+     * [Bauen einer Applikation mit Resource Objekten](bauen-einer-webanwendung.md)
+     * [kubectl/manifest/deployments](/kubectl-examples/03-nginx-deployment.md)
+     * [Services - Aufbau](/kubernetes/services-aufbau.md)
+     * [kubectl/manifest/service](/kubectl-examples/03b-service.md)
+     * DaemonSets (Devs/Ops)
   1. Monitoring with Prometheus / Grafana 
      * [Overview](prometheus/overview.md)
      * [Setup prometheus/Grafana with helm](prometheus/walkthrough-installation-setup.md)
      * [exporters mongodb](prometheus/exporters-and-mongodb.md)
-
   1. Kubernetes Tipps & Tricks 
      * [kubectl kubeconfig mergen](/kubectl/merge-kubeconfig.md)
 
@@ -48,8 +52,7 @@
      * [Netzwerkverbindung zu pod testen](/tipps-tricks/verbindung-zu-pod-testen.md)
      * [Curl from pod api-server](/kubernetes-advanced/curl-api-server.md)
 
-  1. Kubernetes Praxis API-Objekte 
-     * [Das Tool kubectl (Devs/Ops) - Spickzettel](/kubectl/spickzettel.md)
+  1. Kubernetes Praxis API-Objekte
      * [kubectl example with run](/kubectl/run-with-example.md)
      * [Bauen einer Applikation mit Resource Objekten](bauen-einer-webanwendung.md)
      * [kubectl/manifest/deployments](/kubectl-examples/03-nginx-deployment.md)
