@@ -6,6 +6,7 @@
      * [Aufbau Allgemein](/kubernetes/architecture.md)
      * [Structure Kubernetes Deep Dive](https://github.com/jmetzger/training-kubernetes-advanced/assets/1933318/1ca0d174-f354-43b2-81cc-67af8498b56c)
      * [Ports und Protokolle](https://kubernetes.io/docs/reference/networking/ports-and-protocols/)
+     * [kubelet garbage collection](kubelete-garbage-collection.md)
 
   1. Installation 
      * [Kubernetes mit der Cluster API aufsetzen](clusterapi/installation.md)
