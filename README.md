@@ -16,6 +16,8 @@
      * [Services - Aufbau](/kubernetes/services-aufbau.md)
      * [kubectl/manifest/service](/kubectl-examples/03b-service.md)
      * DaemonSets (Devs/Ops)
+  1. Kubernetes - Wartung / Debugging 
+     * [Netzwerkverbindung zu pod testen](/tipps-tricks/verbindung-zu-pod-testen.md)
   1. Monitoring with Prometheus / Grafana 
      * [Overview](prometheus/overview.md)
      * [Setup prometheus/Grafana with helm](prometheus/walkthrough-installation-setup.md)
@@ -30,8 +32,8 @@
      * [Wann wird podIP vergeben ?](kubectl/run-with-example.md)
      * [Bash completion installieren](kubectl/bash-completion.md)
      * [Remote-Verbindung zu Kubernetes (microk8s) einrichten](microk8s/connect-from-remote.md)
-     * [vim support for yaml](vim/vim-yaml.md)
-     
+     * [vim support for yaml](vim/vim-yaml.md)     
+
   1. Kubernetes - Netzwerk (CNI's) / Mesh
      * [Netzwerk Interna](/kubernetes-networks/networking-internal-overview.md)
      * [Übersicht Netzwerke](/kubernetes-networks/overview.md) 
@@ -49,7 +51,6 @@
   1. Kubernetes - Wartung / Debugging 
      * [kubectl drain/uncordon](/kubectl/uncordon-drain.md)
      * [Alte manifeste konvertieren mit convert plugin](/kubectl/convert-plugin.md)
-     * [Netzwerkverbindung zu pod testen](/tipps-tricks/verbindung-zu-pod-testen.md)
      * [Curl from pod api-server](/kubernetes-advanced/curl-api-server.md)
 
   1. Kubernetes Praxis API-Objekte
