@@ -19,12 +19,16 @@
      * DaemonSets (Devs/Ops)
      * [Hintergrund Ingress](/kubernetes/ingress.md) 
      * [Beispiel mit Hostnamen](/kubectl-examples/04-ingress-nginx-with-hostnames.md)
+     * [Configmap MariaDB - Example](kubectl-examples/06a-configmap-mariadb.md)
+  
   1. Kubernetes - Wartung / Debugging 
      * [Netzwerkverbindung zu pod testen](/tipps-tricks/verbindung-zu-pod-testen.md)
+  
   1. Monitoring with Prometheus / Grafana 
      * [Overview](prometheus/overview.md)
      * [Setup prometheus/Grafana with helm](prometheus/walkthrough-installation-setup.md)
      * [exporters mongodb](prometheus/exporters-and-mongodb.md)
+     
   1. Kubernetes Tipps & Tricks 
      * [kubectl kubeconfig mergen](/kubectl/merge-kubeconfig.md)
 
@@ -57,11 +61,6 @@
 
   1. Kubernetes Praxis API-Objekte
      * [kubectl example with run](/kubectl/run-with-example.md)
-     * [Bauen einer Applikation mit Resource Objekten](bauen-einer-webanwendung.md)
-     * [kubectl/manifest/deployments](/kubectl-examples/03-nginx-deployment.md)
-     * [Services - Aufbau](/kubernetes/services-aufbau.md)
-     * [kubectl/manifest/service](/kubectl-examples/03b-service.md)
-     * DaemonSets (Devs/Ops)
      * [Ingress Controller auf Digitalocean (doks) mit helm installieren](/digitalocean/ingress-auf-digitalocean-mit-helm.md)
      * [Documentation for default ingress nginx](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/)
      * [Beispiel Ingress](/kubectl-examples/04-ingress-nginx.md)
@@ -69,7 +68,6 @@
      * [Achtung: Ingress mit Helm - annotations](/ingress-mit-helm-class-achtung.md)
      * [Permanente Weiterleitung mit Ingress](/kubectl-examples/05-ingress-permanent-redirect.md)
      * [ConfigMap Example](/kubectl-examples/06-configmap.md)
-     * [Configmap MariaDB - Example](kubectl-examples/06a-configmap-mariadb.md)
      * [Configmap MariaDB my.cnf](kubectl-examples/06b-mariadb-configmap-configfile.md)     
   
   1. Kubernetes Deployment Scenarios 
@@ -116,7 +114,7 @@
      * [OCI,Container,Images Standards](docker-alternatives-kubernetes.md)
      * [Geolocation Kubernetes Cluster](https://learnk8s.io/bite-sized/connecting-multiple-kubernetes-clusters)
   
-## Backlog
+## Backlog 2
 
   1. Kubernetes - Überblick
      * [Installation - Welche Komponenten from scratch](/kubernetes/installation-components-overview.md)
