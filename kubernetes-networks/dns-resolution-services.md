@@ -1,5 +1,21 @@
 # DNS Resolution of services 
 
+## How does it work 
+
+```
+3 Variants: 
+
+svc-name 
+or:
+svc-name.<namespace>
+or:
+svc-name.<namespace>.svc.cluster.local 
+
+```
+
+
+## Example 
+
 ```
 kubectl run podtest --rm -ti --image busybox 
 If you don't see a command prompt, try pressing enter.
