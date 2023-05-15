@@ -16,7 +16,7 @@
      * [exporters mongodb](prometheus/exporters-and-mongodb.md)
 
   1. Kubernetes Tipps & Tricks 
-     * [kubectl kubeconfig mergen](/kubectl/kubeconfig-mergen.md)
+     * [kubectl kubeconfig mergen](/kubectl/merge-kubeconfig.md)
 
 
 ## Backlog 
