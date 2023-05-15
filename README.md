@@ -15,7 +15,7 @@
      * [kubectl/manifest/deployments](/kubectl-examples/03-nginx-deployment.md)
      * [Services - Aufbau](/kubernetes/services-aufbau.md)
      * [kubectl/manifest/service](/kubectl-examples/03b-service.md)
-     * [DNS - Resolution - Services](kubernetes-networks/dns-resolution-services)
+     * [DNS - Resolution - Services](kubernetes-networks/dns-resolution-services.md)
      * DaemonSets (Devs/Ops)
      * [Hintergrund Ingress](/kubernetes/ingress.md) 
      * [Beispiel mit Hostnamen](/kubectl-examples/04-ingress-nginx-with-hostnames.md)
