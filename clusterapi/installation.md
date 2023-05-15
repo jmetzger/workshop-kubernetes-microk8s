@@ -3,7 +3,7 @@
 ## Prerequisites 
 
   * You need to have a Kubernetes Cluster running (this will be the management cluster) 
-    * Within that you will you cluster api 
+    * Within that you will you have cluster api 
     * This could be something like kind, rancherdesktop.io
     * And of course also a cluster on premise 
 
