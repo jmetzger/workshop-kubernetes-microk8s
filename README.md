@@ -15,6 +15,7 @@
      * [kubectl/manifest/deployments](/kubectl-examples/03-nginx-deployment.md)
      * [Services - Aufbau](/kubernetes/services-aufbau.md)
      * [kubectl/manifest/service](/kubectl-examples/03b-service.md)
+     * [DNS - Resolution - Services](kubernetes-networks/dns-resolution-services)
      * DaemonSets (Devs/Ops)
      * [Hintergrund Ingress](/kubernetes/ingress.md) 
      * [Beispiel mit Hostnamen](/kubectl-examples/04-ingress-nginx-with-hostnames.md)
@@ -45,7 +46,6 @@
      * [Kubernetes Ports/Protokolle](https://kubernetes.io/docs/reference/networking/ports-and-protocols/)
      * [IPV4/IPV6 Dualstack](https://kubernetes.io/docs/concepts/services-networking/dual-stack/)
      * [Ingress controller in microk8s aktivieren](microk8s/ingress.md) 
-     * [DNS - Resolution - Services](kubernetes-networks/dns-resolution-services)
 
   1. Kubernetes - Ingress 
      * [ingress mit ssl absichern](/kubernetes-security/ingress-ssl.md)
