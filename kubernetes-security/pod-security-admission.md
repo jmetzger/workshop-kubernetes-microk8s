@@ -12,6 +12,8 @@
   * baseline - einige Einschränkungen 
   * restricted - sehr streng 
 
+  * Reference: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+
 ## Praktisches Beispiel für Version ab 1.2.23 - Problemstellung 
 
 ```
