@@ -107,8 +107,10 @@ kubectl exec -it nginx-static-web -- bash
 
 ```
 # im pod 
+# does work 
 curl -I https://www.google.com
-curl -I h
+# does not work 
+curl -I https://www.heise.de
 ```
 
 ### Calico 
