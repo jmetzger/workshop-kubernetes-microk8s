@@ -32,6 +32,9 @@
   1. Kubernetes Tipps & Tricks 
      * [kubectl kubeconfig mergen](/kubectl/merge-kubeconfig.md)
 
+  1. Kubernetes Certificates (Control Plane) 
+     * [vmware - cluster api](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-cluster-lifecycle-secrets.html)
+
 
 ## Backlog 
 
