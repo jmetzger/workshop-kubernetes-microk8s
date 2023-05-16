@@ -31,7 +31,7 @@ spec:
           path: "/discount"
 ```          
    
-## Downside egress 
+## Downside egress (NetworkPolicy - not ciliumnetworkpolicy)
 
   * No valid api for anything other than IP's and/or Ports
   * If you want more, you have to use CNI-Plugin specific, e.g. 
@@ -102,6 +102,13 @@ spec:
 
 ```
 kubectl apply -f .
+kubectl exec -it nginx-static-web -- bash 
+```
+
+```
+# im pod 
+curl -I https://www.google.de 
+curl -I h
 ```
 
 ### Calico 
