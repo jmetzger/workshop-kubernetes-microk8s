@@ -110,6 +110,8 @@ kubectl exec -it nginx-static-web -- bash
 # does work 
 curl -I https://www.google.com
 # does not work 
+curl -I https://www.google.de
+# does not work 
 curl -I https://www.heise.de
 ```
 
