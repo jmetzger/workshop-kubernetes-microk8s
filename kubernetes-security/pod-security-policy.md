@@ -42,9 +42,40 @@ spec:
 EOF
 ```
 
-## Step 2: Set the clusterrolebinding
+## Step 2: Set the role
 
 ```
+cat <<EOF | kubectl apply -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: norootcontainers-psp-role
+rules:
+- apiGroups:
+  - policy
+  resourceNames:
+  - norootcontainers
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+EOF
+
+
+```
+
+## Step 3: Set the rolebinding 
+
+```
+
+
+
+```
+
+
+```
+### maybe we use something else --> above 
+
 # We found that role through 
 # kubectl get clusterrole cluster-admin -o yaml 
 # kubectl get clusterrolebinding cluster-admin -o yaml
@@ -72,7 +103,12 @@ EOF
 
 ```
 
+## Step 3: Test to create a pod
 
+```
+
+
+```
 
 
 ## Reference 
