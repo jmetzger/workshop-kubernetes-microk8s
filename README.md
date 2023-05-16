@@ -35,7 +35,7 @@
   1. Kubernetes Certificates (Control Plane) / Security
      * [vmware - cluster api](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-cluster-lifecycle-secrets.html)
      * [Pod Security Admission (PSA)](/kubernetes-security/pod-security-admission.md)
-
+     * [Pod Security Policy (PSP)](/kubernetes-security/pod-security-policy.md)
 
 ## Backlog 
 
