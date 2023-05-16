@@ -11,6 +11,22 @@
   * We should have a running Cluster of 1.22 
   * In our case, we have started that with Rancher Desktop and used that version 
 
+## Walkthrough using kind (Windows) 
+
+### Step 1: Download Kind and install (Windows WSL) 
+
+```
+# if not yet (as admin)
+# wsl --install 
+
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.18.0/kind-linux-amd64
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind
+```
+
+
+
+
 ## Walkthrough (allowPrivilegeEscalation: false)
 
 ### Step 1: Create PodSecurityPolicy (Kubernetes V1.22. policy/v1beta1 
@@ -72,6 +88,24 @@ EOF
 
 ```
 
+
+## Step 2: Create configuration for cluster 
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demopod
+spec:
+  containers:
+    - name:  demopod
+      image: nginx
+```
+
+```
+kubectl apply -f .
+kubectl describe po demopod
+```
 
 ```
 ### maybe we use something else --> above 
