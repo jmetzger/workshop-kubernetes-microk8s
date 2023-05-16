@@ -127,6 +127,41 @@ kubectl -n test-ns1 get pods
 kubectl -n test-ns1 describe pods nginx 
 ```
 
+```
+# Schritt 4:
+# Anpassen der Sicherheitseinstellung (Phase1) im Container 
+```
+
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace: test-ns1
+spec:
+  containers:
+    - image: nginx
+      name: nginx
+      ports:
+        - containerPort: 80
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+
+```
+
+```
+kubectl delete -f 02-nginx.yml
+kubectl apply -f 02-nginx.yml
+kubectl -n test-ns1 get pods 
+```
+
+
 ## Praktisches Beispiel für Version ab 1.2.23 -Lösung - Container als NICHT-Root laufen lassen
 
   * Wir müssen ein image, dass auch als NICHT-Root laufen kann 
