@@ -40,6 +40,7 @@
 
   1. Kubernetes Network / Firewall 
      * [Calico/Cilium - nginx example NetworkPolicy](/kubernetes-network/callico/00-simple-example.md)
+     * [Egress / Ingress Examples with Exercise](/kubernetes-networks/examples-ingress-egress.md)
 
 ## Backlog 
 
