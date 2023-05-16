@@ -33,6 +33,8 @@ kind: Namespace
 metadata:
   name: test-ns1
   labels:
+    # soft version - running but showing complaints 
+    # pod-security.kubernetes.io/enforce: baseline 
     pod-security.kubernetes.io/enforce: restricted
     pod-security.kubernetes.io/audit: restricted
     pod-security.kubernetes.io/warn: restricted
