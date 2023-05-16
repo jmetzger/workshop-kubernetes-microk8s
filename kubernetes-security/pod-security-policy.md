@@ -13,7 +13,7 @@
 
 ## Walkthrough 
 
-### Digitalocean microk8s 1-node - cluster 
+### Step 1: Create Digitalocean microk8s 1-node - cluster, with this cloud-init-script  
 
   * cloud-init (ubuntu 20.04 LTS, 8 GB Ram) 
 
@@ -67,30 +67,71 @@ microk8s start
 
 ```
 
-
-
-## Walkthrough using kind (Windows) 
-
-### Step 1: Download Kind and install (Windows WSL) 
+## Step 2: 
 
 ```
-# if not yet (as admin)
-# wsl --install 
-
-curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.18.0/kind-linux-amd64
-chmod +x ./kind
-sudo mv ./kind /usr/local/bin/kind
+# Setup .kube/config from content
+microk8s config
 ```
 
-
-
-
-## Walkthrough (allowPrivilegeEscalation: false)
-
-### Step 1: Create PodSecurityPolicy (Kubernetes V1.22. policy/v1beta1 
+## Step 3
 
 ```
-cat <<EOF | kubectl apply -f -
+# rbac.yaml 
+# vi service-account.yml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: training
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: pods-clusterrole
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list", "create"]
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["events"]
+  verbs: ["get", "list", "create"]
+---
+# vi rb-training-ns-default-pods.yml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rolebinding-ns-default-pods
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: pods-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: training
+  namespace: default
+```
+
+## Step 4: Secret aus secrets rauskopiert
+
+```
+kubectl get secrets | grep trainingtoken 
+kubectl get secrets training-token<xyz> -o yaml 
+# reinkopiert
+TOKEN=$(echo fsafkdsafkafksadfksafkdsaa | base64 -d) 
+```
+```
+echo $TOKEN
+kubectl config set-context training-ctx --cluster microk8s-cluster --user training
+kubectl config set-credentials training --token=$TOKEN
+
+```
+
+## Step 5: Apply yaml-manifests for psp - stuff (as admin)
+
+```
+# vi setup.yaml 
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
@@ -113,13 +154,7 @@ spec:
     rule: RunAsAny
   volumes:
   - '*'
-EOF
-```
-
-## Step 2: Set the role
-
-```
-cat <<EOF | kubectl apply -f -
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -133,23 +168,30 @@ rules:
   - podsecuritypolicies
   verbs:
   - use
-EOF
-
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: norootcontainers-psp-role:training
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: norootcontainers-psp-role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: training
+  namespace: default
+```  
+ 
+## Step 5: Change to training-ctx and apply 
 
 ```
-
-## Step 3: Set the rolebinding 
-
+kubectl config use-context training-ctx 
 ```
 
-
-
 ```
-
-
-## Step 2: Create configuration for cluster 
-
-```
+# vi demopod.yaml 
 apiVersion: v1
 kind: Pod
 metadata:
@@ -161,46 +203,13 @@ spec:
 ```
 
 ```
-kubectl apply -f .
-kubectl describe po demopod
-```
-
-```
-### maybe we use something else --> above 
-
-# We found that role through 
-# kubectl get clusterrole cluster-admin -o yaml 
-# kubectl get clusterrolebinding cluster-admin -o yaml
-# -> system:masters 
-
-#### This will only work, if you are connected by certificate with a user that 
-#### is in the group system:masters 
-#### You will be able to see that in the client certificate
-# echo "CERTIFICATE DATA FROM KUBECONFIG" | base64 -d > test.crt 
-# openssl x509 -in test.crt -text -noout
-
-cat <<EOF | kubectl apply -f -
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: norootcontainers-psp-role:group:system:masters
-roleRef:
-  kind: ClusterRole
-  name: norootcontainers-psp-role
-  apiGroup: rbac.authorization.k8s.io
-subjects:
-- kind: Group
-  name: system:masters 
-EOF
-
-```
-
-## Step 3: Test to create a pod
-
+kubectl apply -f demopod.yaml
+kubectl get pods ## expecting
+kubectl describe pods demopod 
 ```
 
 
-```
+
 
 
 ## Reference 
