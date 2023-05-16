@@ -8,8 +8,66 @@
 
 ## Prerequisites 
 
-  * We should have a running Cluster of 1.22 
-  * In our case, we have started that with Rancher Desktop and used that version 
+  * We should have a running Cluster of 1.22/1.23
+
+
+## Walkthrough 
+
+### Digitalocean microk8s 1-node - cluster 
+
+  * cloud-init (ubuntu 20.04 LTS, 8 GB Ram) 
+
+```
+#!/bin/bash 
+
+groupadd sshadmin
+USERS="11trainingdo"
+echo $USERS
+for USER in $USERS
+do
+  echo "Adding user $USER"
+  useradd -s /bin/bash --create-home $USER
+  usermod -aG sshadmin $USER
+  echo "$USER:deinsehrgeheimespasswort" | chpasswd
+done
+
+# We can sudo with 11trainingdo
+usermod -aG sudo 11trainingdo 
+
+# 20.04 and 22.04 this will be in the subfolder
+if [ -f /etc/ssh/sshd_config.d/50-cloud-init.conf ]
+then
+  sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/g" /etc/ssh/sshd_config.d/50-cloud-init.conf
+fi
+
+## both is needed 
+sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/g" /etc/ssh/sshd_config
+
+usermod -aG sshadmin root
+
+# TBD - Delete AllowUsers Entries with sed 
+# otherwice we cannot login by group 
+
+echo "AllowGroups sshadmin" >> /etc/ssh/sshd_config 
+systemctl reload sshd 
+
+echo "Installing microk8s"
+snap install --classic --channel=1.23/stable microk8s
+microk8s enable dns rbac
+echo "alias kubectl='microk8s kubectl'" >> /root/.bashrc
+source ~/.bashrc
+alias kubectl='microk8s kubectl'
+
+# now we need to modify the setting of kube-api-server
+# currently in 1.23 no other admission-plugins are activated
+echo "--enable-admission-plugins=PodSecurityPolicy" >> /var/snap/microk8s/current/args/kube-apiserver
+microk8s stop
+microk8s start
+
+
+```
+
+
 
 ## Walkthrough using kind (Windows) 
 
