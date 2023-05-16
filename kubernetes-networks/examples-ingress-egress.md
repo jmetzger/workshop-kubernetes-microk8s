@@ -107,7 +107,7 @@ kubectl exec -it nginx-static-web -- bash
 
 ```
 # im pod 
-curl -I https://www.google.de 
+curl -I https://www.google.com
 curl -I h
 ```
 
