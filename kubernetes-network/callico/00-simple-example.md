@@ -10,6 +10,7 @@ kubectl run --namespace=policy-demo access --rm -ti --image busybox
 ```
 ```
 # innerhalb der shell 
+# Verbindung möglich 
 wget -q nginx -O -
 ```
 ```
@@ -31,6 +32,7 @@ kubectl run --namespace=policy-demo access --rm -ti --image busybox
 
 ```
 # innerhalb der shell 
+# keine Verbindung mehr möglich, weil policy greift 
 wget -q nginx -O -
 ```
 
