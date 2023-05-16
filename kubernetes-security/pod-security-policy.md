@@ -116,7 +116,7 @@ subjects:
 ## Step 4: Secret aus secrets rauskopiert
 
 ```
-kubectl get secrets | grep trainingtoken 
+kubectl get secrets | grep training-token 
 kubectl get secrets training-token<xyz> -o yaml 
 # reinkopiert
 TOKEN=$(echo fsafkdsafkafksadfksafkdsaa | base64 -d) 
