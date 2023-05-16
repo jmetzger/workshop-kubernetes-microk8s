@@ -63,7 +63,7 @@ spec:
 
 ## Example Advanced Egress (cni-plugin specific) 
 
-### Cilium
+### Cilium (Exercise)
 
 ```
 apiVersion: v1
