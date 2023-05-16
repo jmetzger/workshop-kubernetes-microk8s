@@ -63,6 +63,7 @@ spec:
 
 ```
 # a lot of warnings will come up 
+# because this image runs as root !! (by default) 
 kubectl apply -f 02-nginx.yml
 ```
 
