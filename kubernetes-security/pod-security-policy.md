@@ -117,9 +117,8 @@ subjects:
 
 ```
 kubectl get secrets | grep training-token 
-kubectl get secrets training-token<xyz> -o yaml 
-# reinkopiert
-TOKEN=$(echo fsafkdsafkafksadfksafkdsaa | base64 -d) 
+TOKEN=$(kubectl get secrets training-token-<xyz> -o jsonpath='{.data.token}' |  base64 -d)
+# z.B. TOKEN=$(kubectl get secrets training-token-kjl5m -o jsonpath='{.data.token}' |  base64 -d)
 ```
 ```
 echo $TOKEN
