@@ -1,4 +1,4 @@
-# Kubernetes Networking 
+# Kubernetes Advanced 
 
 ## Agenda 
 
@@ -9,6 +9,7 @@
      * [kubelet garbage collection](kubelet-garbage-collection.md)
   1. Installation 
      * [Kubernetes mit der Cluster API aufsetzen](clusterapi/installation.md)
+
   1. Kubernetes Praxis API-Objekte 
      * [Das Tool kubectl (Devs/Ops) - Spickzettel](/kubectl/spickzettel.md)
      * [Bauen einer Applikation mit Resource Objekten](bauen-einer-webanwendung.md)
@@ -36,6 +37,9 @@
      * [vmware - cluster api](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-cluster-lifecycle-secrets.html)
      * [Pod Security Admission (PSA)](/kubernetes-security/pod-security-admission.md)
      * [Pod Security Policy (PSP)](/kubernetes-security/pod-security-policy.md)
+
+  1. Kubernetes Network / Firewall 
+     * [Calico/Cilium - nginx example NetworkPolicy](/kubernetes-network/callico/00-simple-example.md)
 
 ## Backlog 
 
@@ -117,8 +121,6 @@
   1. Kubernetes Interna / Misc.
      * [OCI,Container,Images Standards](docker-alternatives-kubernetes.md)
      * [Geolocation Kubernetes Cluster](https://learnk8s.io/bite-sized/connecting-multiple-kubernetes-clusters)
-  
-## Backlog 2
 
   1. Kubernetes - Überblick
      * [Installation - Welche Komponenten from scratch](/kubernetes/installation-components-overview.md)
