@@ -95,7 +95,7 @@ rules:
   verbs: ["get", "watch", "list", "create"]
 - apiGroups: [""] # "" indicates the core API group
   resources: ["events"]
-  verbs: ["get", "list", "create"]
+  verbs: ["get", "list"]
 ---
 # vi rb-training-ns-default-pods.yml
 apiVersion: rbac.authorization.k8s.io/v1
