@@ -2,7 +2,23 @@
 
 ## Example: newest version with autoscaling/v2 used to be hpa/v1
 
-### Step 1: app 
+### Prerequisites 
+
+  * Metrics-Server needs to be running 
+
+```
+# Test with
+kubectl top pods 
+```
+
+```
+# Install
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+# after that at will be available in kube-system namespace as pod
+kubectl -n kube-system get pods | grep -i metrics 
+```
+
+### Step 1: deploy app 
 
 ```
 cd
