@@ -52,7 +52,7 @@ spec:
 
 ```
 kubectl apply -f . 
-kubectl exec -it --rm podtester --image=busybox 
+kubectl exec -it liveness-http-demo -- bash 
 # mv testpage.html in pod 
 mv /usr/share/nginx/html/testpage.html /usr/share/nginx/html/gone.html 
 ```
