@@ -1,27 +1,87 @@
-# Kubernetes Networking 
+# Kubernetes Advanced 
 
 
 ## Agenda
   1. Kubernetes - Überblick
      * [Aufbau Allgemein](#aufbau-allgemein)
+     * [Structure Kubernetes Deep Dive](https://github.com/jmetzger/training-kubernetes-advanced/assets/1933318/1ca0d174-f354-43b2-81cc-67af8498b56c)
      * [Ports und Protokolle](https://kubernetes.io/docs/reference/networking/ports-and-protocols/)
+     * [kubelet garbage collection](#kubelet-garbage-collection)
+  
+  1. Installation 
+     * [Kubernetes mit der Cluster API aufsetzen](#kubernetes-mit-der-cluster-api-aufsetzen)
+
+  1. Kubernetes Praxis API-Objekte 
+     * [Das Tool kubectl (Devs/Ops) - Spickzettel](#das-tool-kubectl-devsops---spickzettel)
+     * [Bauen einer Applikation mit Resource Objekten](#bauen-einer-applikation-mit-resource-objekten)
+     * [kubectl/manifest/deployments](#kubectlmanifestdeployments)
+     * [Services - Aufbau](#services---aufbau)
+     * [kubectl/manifest/service](#kubectlmanifestservice)
+     * [DNS - Resolution - Services](#dns---resolution---services)
+     * DaemonSets (Devs/Ops)
+     * [Hintergrund Ingress](#hintergrund-ingress)
+     * [Beispiel mit Hostnamen](#beispiel-mit-hostnamen)
+     * [Configmap MariaDB - Example](#configmap-mariadb---example)
+  
+  1. Kubernetes - Wartung / Debugging 
+     * [Netzwerkverbindung zu pod testen](#netzwerkverbindung-zu-pod-testen)
+
+  1. Kubernetes Backup 
+     * [Backups mit Velero](#backups-mit-velero)
+
+  1. Kubernetes Upgrade 
+     * [Upgrade von tanzu (Cluster API)](#upgrade-von-tanzu-cluster-api)
+  
+  1. Monitoring with Prometheus / Grafana 
+     * [Overview](#overview)
+     * [Setup prometheus/Grafana with helm](#setup-prometheusgrafana-with-helm)
+     * [exporters mongodb](#exporters-mongodb)
+     * [Good Kubernetes Board for Grafana](#good-kubernetes-board-for-grafana)
      
+  1. Kubernetes Tipps & Tricks 
+     * [kubectl kubeconfig mergen](#kubectl-kubeconfig-mergen)
+
+  1. Kubernetes Certificates (Control Plane) / Security
+     * [vmware - cluster api](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-cluster-lifecycle-secrets.html)
+     * [Pod Security Admission (PSA)](#pod-security-admission-psa)
+     * [Pod Security Policy (PSP)](#pod-security-policy-psp)
+
+  1. Kubernetes Network / Firewall 
+     * [Calico/Cilium - nginx example NetworkPolicy](#calicocilium---nginx-example-networkpolicy)
+     * [Egress / Ingress Examples with Exercise](#egress--ingress-examples-with-exercise)
+     * [Mesh / istio](#mesh--istio)
+
+  1. Kubernetes Probes (Liveness and Readiness) 
+     * [Übung Liveness-Probe](#übung-liveness-probe)
+     * [Übung Liveness http aus nginx](#übung-liveness-http-aus-nginx)
+     * [Funktionsweise Readiness-Probe vs. Liveness-Probe](#funktionsweise-readiness-probe-vs-liveness-probe)
+     * [Manueller Check readyz endpoint kubernetes api server aus pod](#manueller-check-readyz-endpoint-kubernetes-api-server-aus-pod)
+
+  1. Kubernetes QoS / Limits / Requests
+     * [Quality of Service - evict pods](#quality-of-service---evict-pods)
+     * [Tools to identify LimitRange and Requests](#tools-to-identify-limitrange-and-requests)
+
+  1. Kubernetes Autoscaling 
+     * [Autoscaling Pods/Deployments](#autoscaling-podsdeployments)
+
+  1. Kubernetes Deployment Scenarios 
+     * [Deployment green/blue,canary,rolling update](#deployment-greenbluecanaryrolling-update)
+     * [Service Blue/Green](#service-bluegreen)
+     * [Praxis-Übung A/B Deployment](#praxis-übung-ab-deployment)
+
+## Backlog 
+
   1. Kubernetes - Misc 
      * [Wann wird podIP vergeben ?](#wann-wird-podip-vergeben-)
      * [Bash completion installieren](#bash-completion-installieren)
      * [Remote-Verbindung zu Kubernetes (microk8s) einrichten](#remote-verbindung-zu-kubernetes-microk8s-einrichten)
      * [vim support for yaml](#vim-support-for-yaml)
-     
+
   1. Kubernetes - Netzwerk (CNI's) / Mesh
      * [Netzwerk Interna](#netzwerk-interna)
      * [Übersicht Netzwerke](#übersicht-netzwerke)
-     * [Calico/Cilium - nginx example NetworkPolicy](#calicocilium---nginx-example-networkpolicy)
-     * [Beispiele Ingress Egress NetworkPolicy](#beispiele-ingress-egress-networkpolicy)
-     * [Mesh / istio](#mesh--istio)
-     * [Kubernetes Ports/Protokolle](https://kubernetes.io/docs/reference/networking/ports-and-protocols/)
      * [IPV4/IPV6 Dualstack](https://kubernetes.io/docs/concepts/services-networking/dual-stack/)
      * [Ingress controller in microk8s aktivieren](#ingress-controller-in-microk8s-aktivieren)
-     * [DNS - Resolution - Services](#dns---resolution---services)
 
   1. Kubernetes - Ingress 
      * [ingress mit ssl absichern](#ingress-mit-ssl-absichern)
@@ -29,33 +89,18 @@
   1. Kubernetes - Wartung / Debugging 
      * [kubectl drain/uncordon](#kubectl-drainuncordon)
      * [Alte manifeste konvertieren mit convert plugin](#alte-manifeste-konvertieren-mit-convert-plugin)
-     * [Netzwerkverbindung zu pod testen](#netzwerkverbindung-zu-pod-testen)
      * [Curl from pod api-server](#curl-from-pod-api-server)
 
-  1. Kubernetes Praxis API-Objekte 
-     * [Das Tool kubectl (Devs/Ops) - Spickzettel](#das-tool-kubectl-devsops---spickzettel)
+  1. Kubernetes Praxis API-Objekte
      * [kubectl example with run](#kubectl-example-with-run)
-     * [Bauen einer Applikation mit Resource Objekten](#bauen-einer-applikation-mit-resource-objekten)
-     * [kubectl/manifest/deployments](#kubectlmanifestdeployments)
-     * [Services - Aufbau](#services---aufbau)
-     * [kubectl/manifest/service](#kubectlmanifestservice)
-     * DaemonSets (Devs/Ops)
-     * [Hintergrund Ingress](#hintergrund-ingress)
      * [Ingress Controller auf Digitalocean (doks) mit helm installieren](#ingress-controller-auf-digitalocean-doks-mit-helm-installieren)
      * [Documentation for default ingress nginx](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/)
      * [Beispiel Ingress](#beispiel-ingress)
      * [Install Ingress On Digitalocean DOKS](#install-ingress-on-digitalocean-doks)
-     * [Beispiel mit Hostnamen](#beispiel-mit-hostnamen)
      * [Achtung: Ingress mit Helm - annotations](#achtung-ingress-mit-helm---annotations)
      * [Permanente Weiterleitung mit Ingress](#permanente-weiterleitung-mit-ingress)
      * [ConfigMap Example](#configmap-example)
-     * [Configmap MariaDB - Example](#configmap-mariadb---example)
      * [Configmap MariaDB my.cnf](#configmap-mariadb-mycnf)
-  
-  1. Kubernetes Deployment Scenarios 
-     * [Deployment green/blue,canary,rolling update](#deployment-greenbluecanaryrolling-update)
-     * [Service Blue/Green](#service-bluegreen)
-     * [Praxis-Übung A/B Deployment](#praxis-übung-ab-deployment)
      
   1. Helm (Kubernetes Paketmanager) 
      * [Helm Grundlagen](#helm-grundlagen)
@@ -66,9 +111,6 @@
      * [Nutzer einrichten microk8s ab kubernetes 1.25](#nutzer-einrichten-microk8s-ab-kubernetes-125)
      * [Tipps&Tricks zu Deploymnent - Rollout](#tippstricks-zu-deploymnent---rollout)
 
-  1. Kubernetes QoS 
-     * [Quality of Service - evict pods](#quality-of-service---evict-pods)
-
   1. Kustomize 
      * [Kustomize Overlay Beispiel](#kustomize-overlay-beispiel)
      * [Helm mit kustomize verheiraten](#helm-mit-kustomize-verheiraten)
@@ -77,7 +119,6 @@
      * [Kubernetes Debuggen ClusterIP/PodIP](#kubernetes-debuggen-clusterippodip)
      * [Debugging pods](#debugging-pods)
      * [Taints und Tolerations](#taints-und-tolerations)
-     * [Autoscaling Pods/Deployments](#autoscaling-podsdeployments)
      * [pod aus deployment bei config - Änderung neu ausrollen](https://github.com/stakater/Reloader)
 
   1. Kubernetes Advanced 
@@ -95,8 +136,6 @@
   1. Kubernetes Interna / Misc.
      * [OCI,Container,Images Standards](#ocicontainerimages-standards)
      * [Geolocation Kubernetes Cluster](https://learnk8s.io/bite-sized/connecting-multiple-kubernetes-clusters)
-  
-## Backlog
 
   1. Kubernetes - Überblick
      * [Installation - Welche Komponenten from scratch](#installation---welche-komponenten-from-scratch)
@@ -134,9 +173,7 @@
   1. Kubernetes - Hardening 
      * [Kubernetes Tipps Hardening](#kubernetes-tipps-hardening)
 
-  1. Kubernetes Probes (Liveness and Readiness) 
-     * [Übung Liveness-Probe](#übung-liveness-probe)
-     * [Funktionsweise Readiness-Probe vs. Liveness-Probe](#funktionsweise-readiness-probe-vs-liveness-probe)
+
        
 
      
@@ -229,9 +266,2643 @@ Er stellt sicher, dass Container in einem Pod ausgeführt werden.
   * https://www.redhat.com/de/topics/containers/kubernetes-architecture
 
 
+### Structure Kubernetes Deep Dive
+
+  * https://github.com/jmetzger/training-kubernetes-advanced/assets/1933318/1ca0d174-f354-43b2-81cc-67af8498b56c
+
 ### Ports und Protokolle
 
   * https://kubernetes.io/docs/reference/networking/ports-and-protocols/
+
+### kubelet garbage collection
+
+
+### What is do  ? 
+
+ * Deletes unused containers after 1 minutes 
+ * and unused images after 5 minutes 
+
+### Reference:
+
+  * https://kubernetes.io/docs/concepts/architecture/garbage-collection/#containers-images
+
+### list images with ctr 
+
+  * ctr is the cli tool for containerd 
+
+```
+## from client  
+kubectl run nginx --image nginx 
+
+## on worker - node 
+ctr images list | grep nginx 
+```
+
+## Installation 
+
+### Kubernetes mit der Cluster API aufsetzen
+
+
+### Prerequisites 
+
+  * You need to have a Kubernetes Cluster running (this will be the management cluster) 
+    * Within that you will you have cluster api 
+    * This could be something like kind, rancherdesktop.io
+    * And of course also a cluster on premise 
+
+### Step 1: Create Management Cluster 
+
+#### Step 1a: Install clusterctl 
+
+```
+## Install rancherdesktop.io 
+## You are able to use it on windows (that's what we do now, and install 
+
+## Install clusterctl in wsl -> Ubuntu 
+sudo su -
+cd /usr/src 
+curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v1.4.2/clusterctl-linux-amd64 -o clusterctl
+sudo install -o root -g root -m 0755 clusterctl /usr/local/bin/clusterctl
+clusterctl version 
+```
+
+  * Reference gist: https://gist.github.com/vfarcic/d8113b6f149583e1cf1614d76f2a4182
+  * https://cluster-api.sigs.k8s.io/user/quick-start.html#install-clusterctl
+
+#### Step 1b: Set env variables for digitalocean 
+
+```
+export DIGITALOCEAN_ACCESS_TOKEN=[...] # Replace with your token here 
+
+```
+
+
+#### Step 1c: Create kubernetes snapshot to be used for Kubernetes Control Plane and workers 
+
+``` 
+## can be done as unprivileged user !!! 
+export PATH=$PATH:~/.local/bin
+sudo apt update
+apt install -y jq zip 
+sudo git clone https://github.com/kubernetes-sigs/image-builder
+cd image-builder/images/capi
+cat Makefile
+## Size of machine will always be 1gb and 1vcpu created in NYC1 
+make build-do-ubuntu-2004
+```
+
+#### Step 1d: Add Snapshot to Region FRA1
+
+```
+-> Add to Region FRA1 -> under Manage -> Images -> Snapshots 
+Please do this through the web-interface of DigitalOcean 
+## IF YOU DO NOT DO THIS... Droplets cannot be created because they are in NYC1
+```
+
+#### Step 1e: Install doctl (optional)
+
+```
+## works in most cases on wsl, but only if snap is working properly 
+## snap install doctl 
+## if not do -> this 
+
+cd ~
+wget https://github.com/digitalocean/doctl/releases/download/v1.94.0/doctl-1.94.0-linux-amd64.tar.gz
+tar xf ~/doctl-1.94.0-linux-amd64.tar.gz
+sudo mv ~/doctl /usr/local/bin
+
+## now authenticate 
+doctl auth init --access-token ${DIGITALOCEAN_ACCESS_TOKEN}
+
+```
+
+#### Step 1f: Set env for to create worker cluster with controlplane and workers 
+
+```
+## control the datacenter - default nyc1 
+export DO_REGION=fra1
+## control size of machines
+## default 1vcpu-1gb 
+export DO_CONTROL_PLANE_MACHINE_TYPE=s-2vcpu-2gb
+export DO_NODE_MACHINE_TYPE=s-2vcpu-2gb
+## needed to set up the api provider 
+export DO_B64ENCODED_CREDENTIALS="$(\
+    echo -n "$DIGITALOCEAN_ACCESS_TOKEN" \
+    | base64 \
+    | tr -d '\n')"
+    
+## get the snapshot id / get the right id 
+doctl compute image list-user
+## e.g. 
+## 132627725
+
+export DO_CONTROL_PLANE_MACHINE_IMAGE=132627725
+export DO_NODE_MACHINE_IMAGE=132627725
+
+```
+
+#### Step 1g: Setup cluster and api-provider 
+
+```
+### In our case it sets up the management cluster on rancher 
+### to be used for kubernetes 
+cd ../../../
+
+clusterctl init \
+    --infrastructure digitalocean
+
+```
+
+#### Step 1h: Generate the yaml scripts for both control plane and workers 
+
+```
+## it looks there will be a fingerprint to be used, which chooses the ssh-key to be used
+## to connect to the machines
+## look for all the ssh-key like so:
+doctl compute ssh-key list 
+
+## So we choose one from the list 
+export DO_SSH_KEY_FINGERPRINT=[...]
+
+## Check the variables 
+## Show use the necessary env-variables.
+clusterctl generate cluster devops-toolkit \
+    --infrastructure digitalocean \
+    --target-namespace infra \
+    --kubernetes-version v1.24.11 \
+    --control-plane-machine-count 3 \
+    --worker-machine-count 3 \
+    --list-variables 
+
+
+## Kuberentes must be the same version as you created the snapshots for do
+## to be used for digitalocean -> creating a cluster there
+clusterctl generate cluster devops-toolkit \
+    --infrastructure digitalocean \
+    --target-namespace infra \
+    --kubernetes-version v1.24.11 \
+    --control-plane-machine-count 3 \
+    --worker-machine-count 3 \
+    | tee cluster.yaml
+    
+kubectl create namespace infra
+
+kubectl apply --filename cluster.yaml
+```
+
+#### Step 1i: Wait till the control plane is initialized + install calico 
+
+```
+kubectl get kubeadmcontrolplane
+
+## When initialized get kubeconfig and install calicao 
+clusterctl --namespace infra2 \
+    get kubeconfig devops-toolkit \
+    | tee kubeconfig.yaml
+
+
+kubectl --kubeconfig kubeconfig.yaml get ns
+## you will see control plane is not ready because of network missing
+kubectl --kubeconfig kubeconfig.yaml get nodes
+
+kubectl --kubeconfig kubeconfig.yaml apply -f https://docs.projectcalico.org/v3.25/manifests/calico.yaml
+
+```
+
+#### Step 1j: READY it is (says Yoda) 
+
+```
+## Wait a while, now you will see, the nodes are ready
+kubectl --kubeconfig kubeconfig.yaml get nodes 
+``` 
+
+## Kubernetes Praxis API-Objekte 
+
+### Das Tool kubectl (Devs/Ops) - Spickzettel
+
+
+### Allgemein 
+
+```
+## Zeige Information über das Cluster 
+kubectl cluster-info 
+
+## Welche api-resources gibt es ?
+kubectl api-resources 
+
+## Hilfe zu object und eigenschaften bekommen
+kubectl explain pod 
+kubectl explain pod.metadata
+kubectl explain pod.metadata.name 
+
+```
+
+### Arbeiten mit manifesten 
+
+```
+kubectl apply -f nginx-replicaset.yml 
+## Wie ist aktuell die hinterlegte config im system
+kubectl get -o yaml -f nginx-replicaset.yml 
+
+## Änderung in nginx-replicaset.yml z.B. replicas: 4 
+## dry-run - was wird geändert 
+kubectl diff -f nginx-replicaset.yml 
+
+## anwenden 
+kubectl apply -f nginx-replicaset.yml 
+
+## Alle Objekte aus manifest löschen
+kubectl delete -f nginx-replicaset.yml 
+
+
+```
+
+### Ausgabeformate 
+
+```
+## Ausgabe kann in verschiedenen Formaten erfolgen 
+kubectl get pods -o wide # weitere informationen 
+## im json format
+kubectl get pods -o json 
+
+## gilt natürluch auch für andere kommandos
+kubectl get deploy -o json 
+kubectl get deploy -o yaml 
+
+## get a specific value from the complete json - tree 
+kubectl get node k8s-nue-jo-ff1p1 -o=jsonpath='{.metadata.labels}'
+
+```
+
+
+
+### Zu den Pods 
+
+```
+## Start einen pod // BESSER: direkt manifest verwenden
+## kubectl run podname image=imagename 
+kubectl run nginx image=nginx 
+
+## Pods anzeigen 
+kubectl get pods 
+kubectl get pod
+## Format weitere Information 
+kubectl get pod -o wide 
+## Zeige labels der Pods
+kubectl get pods --show-labels 
+
+## Zeige pods mit einem bestimmten label 
+kubectl get pods -l app=nginx 
+
+## Status eines Pods anzeigen 
+kubectl describe pod nginx 
+
+## Pod löschen 
+kubectl delete pod nginx 
+
+## Kommando in pod ausführen 
+kubectl exec -it nginx -- bash 
+
+```
+
+### Arbeiten mit namespaces 
+
+```
+## Welche namespaces auf dem System 
+kubectl get ns 
+kubectl get namespaces 
+## Standardmäßig wird immer der default namespace verwendet 
+## wenn man kommandos aufruft 
+kubectl get deployments 
+
+## Möchte ich z.B. deployment vom kube-system (installation) aufrufen, 
+## kann ich den namespace angeben
+kubectl get deployments --namespace=kube-system 
+kubectl get deployments -n kube-system 
+
+## wir wollen unseren default namespace ändern 
+kubectl config set-context --current --namespace <dein-namespace>
+```
+
+
+
+### Referenz
+
+  * https://kubernetes.io/de/docs/reference/kubectl/cheatsheet/
+
+### Bauen einer Applikation mit Resource Objekten
+
+
+![Bauen einer Webanwendung](images/WebApp.drawio.png)
+
+### kubectl/manifest/deployments
+
+
+```
+cd
+mkdir -p manifests
+cd manifests
+mkdir 03-deploy
+cd 03-deploy 
+nano deploy.yml 
+```
+
+```
+
+## vi deploy.yml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 8 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+        
+```
+
+```
+kubectl apply -f deploy.yml 
+```
+
+### Services - Aufbau
+
+
+![Services Aufbau](/images/kubernetes-services.drawio.svg)
+
+### kubectl/manifest/service
+
+
+### Schritt 1: Deployment 
+
+```
+cd
+mkdir -p manifests
+cd manifests 
+mkdir 04-service 
+cd 04-service 
+```
+
+```
+## 01-deploy.yml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  selector:
+    matchLabels:
+      run: my-nginx
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        run: my-nginx
+    spec:
+      containers:
+      - name: my-nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+```
+
+```
+kubectl apply -f .
+```
+
+### Schritt 2:
+
+
+```
+## 02-svc.yml 
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-nginx
+  labels:
+    svc: nginx
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    run: my-nginx
+```
+
+```
+kubectl apply -f . 
+```
+
+
+### Ref.
+
+  * https://kubernetes.io/docs/concepts/services-networking/connect-applications-service/
+
+### DNS - Resolution - Services
+
+
+### How does it work 
+
+```
+3 Variants: 
+
+svc-name 
+or:
+svc-name.<namespace>
+or:
+svc-name.<namespace>.svc.cluster.local 
+
+```
+
+
+### Example 
+
+```
+kubectl run podtest --rm -ti --image busybox 
+If you don't see a command prompt, try pressing enter.
+/ # wget -O - http://apple-service.jochen
+Connecting to apple-service.jochen (10.245.39.214:80)
+writing to stdout
+apple-tln1
+-                    100% |**************************************************************************************************************|    11  0:00:00 ETA
+written to stdout
+/ # wget -O - http://apple-service.jochen.svc.cluster.local
+Connecting to apple-service.jochen.svc.cluster.local (10.245.39.214:80)
+writing to stdout
+apple-tln1
+-                    100% |**************************************************************************************************************|    11  0:00:00 ETA
+written to stdout
+/ # wget -O - http://apple-service
+Connecting to apple-service (10.245.39.214:80)
+writing to stdout
+apple-tln1
+-                    100% |**************************************************************************************************************|    11  0:00:00 ETA
+written to stdout
+```
+
+### Hintergrund Ingress
+
+
+
+
+### Ref. / Dokumentation 
+
+  * https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-ingress-guide-nginx-example.html
+
+### Beispiel mit Hostnamen
+
+
+### Prerequisits
+
+```
+## Ingress Controller muss aktiviert sein 
+### Nur der Fall wenn man microk8s zum Einrichten verwendet 
+### Ubuntu 
+microk8s enable ingress
+```
+
+### Walkthrough 
+
+#### Step 1: pods and services
+
+```
+cd
+mkdir -p manifests
+cd manifests 
+mkdir abi
+cd abi
+```
+
+```
+## apple.yml 
+## vi apple.yml 
+kind: Pod
+apiVersion: v1
+metadata:
+  name: apple-app
+  labels:
+    app: apple
+spec:
+  containers:
+    - name: apple-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=apple-<dein-name>"
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: apple-service
+spec:
+  selector:
+    app: apple
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5678 # Default port for image
+```
+
+```
+kubectl apply -f apple.yml 
+```
+
+```
+## banana
+## vi banana.yml
+kind: Pod
+apiVersion: v1
+metadata:
+  name: banana-app
+  labels:
+    app: banana
+spec:
+  containers:
+    - name: banana-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=banana-<dein-name>"
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: banana-service
+spec:
+  selector:
+    app: banana
+  ports:
+    - port: 80
+      targetPort: 5678 # Default port for image
+```
+
+```
+kubectl apply -f banana.yml
+```
+
+### Step 2: Ingress 
+
+```
+## Ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: example-ingress
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    # with the ingress controller from helm, you need to set an annotation 
+    # otherwice it does not know, which controller to use
+    # old version... use ingressClassName instead 
+    # kubernetes.io/ingress.class: nginx
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "<euername>.lab<nr>.t3isp.de"
+    http:
+      paths:
+        - path: /apple
+          backend:
+            serviceName: apple-service
+            servicePort: 80
+        - path: /banana
+          backend:
+            serviceName: banana-service
+            servicePort: 80
+```
+
+```
+## ingress 
+kubectl apply -f ingress.yml
+kubectl get ing 
+```
+
+### Reference 
+
+  * https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-ingress-guide-nginx-example.html
+
+### Find the problem 
+
+```
+## Hints 
+
+## 1. Which resources does our version of kubectl support 
+## Can we find Ingress as "Kind" here.
+kubectl api-ressources 
+
+## 2. Let's see, how the configuration works 
+kubectl explain --api-version=networking.k8s.io/v1 ingress.spec.rules.http.paths.backend.service
+
+## now we can adjust our config 
+```
+
+### Solution
+
+```
+## in kubernetes 1.22.2 - ingress.yml needs to be modified like so.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    # with the ingress controller from helm, you need to set an annotation 
+    # old version useClassName instead 
+    # otherwice it does not know, which controller to use
+    # kubernetes.io/ingress.class: nginx 
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "app12.lab.t3isp.de"
+    http:
+      paths:
+        - path: /apple
+          pathType: Prefix
+          backend:
+            service:
+              name: apple-service
+              port:
+                number: 80
+        - path: /banana
+          pathType: Prefix
+          backend:
+            service:
+              name: banana-service
+              port:
+                number: 80                
+```
+
+### Configmap MariaDB - Example
+
+
+### Schritt 1: configmap 
+
+```
+cd 
+mkdir -p manifests
+cd manifests
+mkdir cftest 
+cd cftest 
+nano 01-configmap.yml 
+```
+
+```
+### 01-configmap.yml
+kind: ConfigMap 
+apiVersion: v1 
+metadata:
+  name: mariadb-configmap 
+data:
+  # als Wertepaare
+  MARIADB_ROOT_PASSWORD: 11abc432
+```
+
+```
+kubectl apply -f .
+kubectl get cm
+kubectl get cm mariadb-configmap -o yaml
+```
+
+
+### Schritt 2: Deployment 
+```
+nano 02-deploy.yml
+```
+
+```
+##deploy.yml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-deployment
+spec:
+  selector:
+    matchLabels:
+      app: mariadb
+  replicas: 1 
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+      - name: mariadb-cont
+        image: mariadb:latest
+        envFrom:
+        - configMapRef:
+            name: mariadb-configmap
+
+```
+
+```
+kubectl apply -f .
+```
+
+### Important Sidenode 
+
+  * If configmap changes, deployment does not know
+  * So kubectl apply -f deploy.yml will not have any effect
+  * to fix, use stakater/reloader: https://github.com/stakater/Reloader
+
+
+## Kubernetes - Wartung / Debugging 
+
+### Netzwerkverbindung zu pod testen
+
+
+### Situation 
+
+```
+Managed Cluster und ich kann nicht auf einzelne Nodes per ssh zugreifen
+```
+
+### Behelf: Eigenen Pod starten mit busybox 
+
+```
+## laengere Version 
+kubectl run podtest --rm -ti --image busybox -- /bin/sh
+```
+
+```
+## kuerzere Version 
+kubectl run podtest --rm -ti --image busybox 
+```
+
+### Example test connection 
+
+```
+## wget befehl zum Kopieren
+wget -O - http://10.244.0.99
+```
+
+```
+## -O -> Output (grosses O (buchstabe)) 
+kubectl run podtest --rm -ti --image busybox -- /bin/sh
+/ # wget -O - http://10.244.0.99
+/ # exit 
+```
+
+## Kubernetes Backup 
+
+### Backups mit Velero
+
+
+### Schaubild 
+
+![image](https://github.com/jmetzger/training-kubernetes-advanced/assets/1933318/c1e1172b-e57f-4c50-a372-ba2f1452ed26)
+
+### Walkthrough in digitalocean 
+
+  * https://www.digitalocean.com/community/tutorials/how-to-back-up-and-restore-a-kubernetes-cluster-on-digitalocean-using-velero
+
+## Kubernetes Upgrade 
+
+### Upgrade von tanzu (Cluster API)
+
+
+### Step 1: Upgrade Tanzu Kubernetes Grid (Cluster Api) 
+
+  * https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-upgrade-tkg-index.html
+
+### Step 2: Upgrade Management Cluster 
+
+  * https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-upgrade-tkg-management-cluster.html
+
+### Step 3: Variante 1: Workload Cluster aktualisieren.
+
+  * https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-upgrade-tkg-workload-clusters.html
+
+### Step 3: Variante 2: Neues Cluster hochziehen, ausrollen und altes abschalten
+
+  * https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-tanzu-k8s-clusters-index.html
+
+## Monitoring with Prometheus / Grafana 
+
+### Overview
+
+
+### What does it do ?
+
+  * It monitors your system by collecting data
+  * Data is pulled from your system by defined endpoints (http) from your cluster 
+  * To provide data on your system, a lot of exporters are available, that
+    * collect the data and provide it in Prometheus
+
+### Technical 
+
+  * Prometheus has a TDB (Time Series Database) and is good as storing time series with data
+  * Prometheus includes a local on-disk time series database, but also optionally integrates with remote storage systems.
+  * Prometheus's local time series database stores data in a custom, highly efficient format on local storage.
+  * Ref: https://prometheus.io/docs/prometheus/latest/storage/
+
+### What are time series ? 
+
+  * A time series is a sequence of data points that occur in successive order over some period of time. 
+  * Beispiel: 
+    * Du willst die täglichen Schlusspreise für eine Aktie für ein Jahr dokumentieren
+    * Damit willst Du weitere Analysen machen 
+    * Du würdest das Paar Datum/Preis dann in der Datumsreihenfolge sortieren und so ausgeben
+    * Dies wäre eine "time series" 
+
+### Kompenenten von Prometheus 
+
+![Prometheus Schaubild](https://www.devopsschool.com/blog/wp-content/uploads/2021/01/What-is-Prometheus-Architecutre-components1-740x414.png)
+
+Quelle: https://www.devopsschool.com/
+
+#### Prometheus Server 
+
+1. Retrieval (Sammeln) 
+   * Data Retrieval Worker 
+     * pull metrics data
+1. Storage 
+   * Time Series Database (TDB)
+     * stores metrics data
+1. HTTP Server 
+   * Accepts PromQL - Queries (e.g. from Grafana)
+     * accept queries 
+  
+### Grafana ? 
+
+  * Grafana wird meist verwendet um die grafische Auswertung zu machen.
+  * Mit Grafana kann ich einfach Dashboards verwenden 
+  * Ich kann sehr leicht festlegen (Durch Data Sources), so meine Daten herkommen
+
+### Setup prometheus/Grafana with helm
+
+
+### Prerequisites
+
+  * Ubuntu 20.04 with running microk8s single cluster 
+  * Works on any other cluster, but installing helm is different 
+
+### Prepare 
+
+```
+## Be sure helm is installed on your client 
+## In our walkthrough, we will do it directly on 1 node, 
+## which is not recommended for Production 
+
+```
+
+### Walkthrough 
+
+#### Step 1: install helm, if not there yet
+
+```
+snap install --classic helm 
+```
+
+#### Step 2: Rollout prometheus/grafana stack in namespace prometheus 
+
+```
+## add prometheus repo 
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+## install stack into new prometheus namespace 
+helm install -n prometheus --create-namespace prometheus prometheus-community/kube-prometheus-stack
+
+## After installation look at the pods 
+## You should see 3 pods 
+kubectl --namespace prometheus get pods -l "release=prometheus"
+
+## After a while it should be more pods
+kubectl get all -n prometheus
+
+```
+
+#### Step 3a Let's explain (der Prometheus - Server)  
+
+```
+## 2 Stateful sets
+kubectl get statefulsets  -n prometheus
+## output 
+## alertmanager-prometheus-kube-prometheus-alertmanager   1/1     5m14s
+## prometheus-prometheus-kube-prometheus-prometheus.      1/1.    5m23s
+```
+```
+## Moving part 1: 
+## prometheus-prometheus-kube-prometheus-prometheus
+## That is the core prometheus server based on the main image 
+
+## Let's validate 
+## schauen wir mal in das File 
+kubectl get statefulset -n prometheus -o yaml > sts-prometheus-server.yml
+
+## Und vereinfacht (jetzt sehen wir direkt die beiden verwendeten images)
+## 1) prometheus - server
+## 2) der dazugehörige config-reloader als Side-Car 
+kubectl get sts -n prometheus prometheus-prometheus-kube-prometheus-prometheus -o jsonpath='{.spec.template.spec.containers[*].image}'
+
+## Aber wer managed den server -> managed-by -> kubernetes-operator 
+kubectl get sts -n prometheus prometheus-prometheus-kube-prometheus-prometheus -o jsonpath="{.spec.template.metadata.labels}" | jq .
+
+## Wir der sts von helm erstellt ? 
+## NEIN ;o) 
+## show us all the template that helm generate to apply them to kube-api-server 
+helm template prometheus prometheus-community/kube-prometheus-stack > all-prometheus.yml 
+## NOPE -> none 
+cat all-prometheus.yaml | grep -i kind: | grep -i stateful
+
+## secrets -> configuration von prometheus
+## wenn ein eigenschaft Punkte hat, z.B. prometheus.yaml.gz
+##
+## {"prometheus.yaml.gz":"H4s 
+## dann muss man escapen, um darauf zuzugreifen -> aus . wird \.
+kubectl get -n prometheus secrets prometheus-prometheus-kube-prometheus-prometheus -o jsonpath='{.data.prometheus\.yaml\.gz}' | base64 -d | gzip -d - 
+
+
+```
+
+### Step 3b: Prometheus Operator und Admission Controller -> Hook 
+
+```
+## The Prometheus Operator for Kubernetes 
+## provides easy monitoring definitions 
+## for Kubernetes services and deployment and management of Prometheus instances.
+
+## But how are they created 
+## After installation new resource-type are introduced 
+cat all-prometheus.yaml | grep ^kind: | grep -e 'Prometheus' -e 'ServiceM' | uniq
+kind: Prometheus
+kind: PrometheusRule
+kind: ServiceMonitor
+```
+
+#### Step 3c: How are the StatefulSets created
+
+```
+## New custom resource definitions are created 
+## The Prometheus custom resource definition (CRD) declaratively defines a desired Prometheus setup to run in a Kubernetes cluster. It provides options to # configure replication, persistent storage, and Alertmanagers to which the deployed Prometheus instances send alerts to.
+
+## For each Prometheus resource, the Operator deploys a properly configured StatefulSet in the same namespace. The Prometheus Pods are configured to mount # ca Secret called <prometheus-name> containing the configuration for Prometheus.
+## https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/crds/crd-prometheuses.yaml
+
+```
+
+#### Step 3d: How are PrometheusRules created 
+
+```
+## PrometheusRule are manipulated by the MutationHook when they enter the AdmissionController
+## The AdmissionController is used after proper authentication in the kube-api-server
+
+cat all-prometheus.yml | grep 'Mutating' -B1 -A32
+```
+
+```
+## Output 
+## Ref: https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name:  prometheus-kube-prometheus-admission
+  labels:
+    app: kube-prometheus-stack-admission    
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: prometheus
+    app.kubernetes.io/version: "35.4.2"
+    app.kubernetes.io/part-of: kube-prometheus-stack
+    chart: kube-prometheus-stack-35.4.2
+    release: "prometheus"
+    heritage: "Helm"
+webhooks:
+  - name: prometheusrulemutate.monitoring.coreos.com
+    failurePolicy: Ignore
+    rules:
+      - apiGroups:
+          - monitoring.coreos.com
+        apiVersions:
+          - "*"
+        resources:
+          - prometheusrules
+        operations:
+          - CREATE
+          - UPDATE
+    clientConfig:
+      service:
+        namespace: prometheus
+        name: prometheus-kube-prometheus-operator
+        path: /admission-prometheusrules/mutate
+    admissionReviewVersions: ["v1", "v1beta1"]
+    sideEffects: None
+```
+
+#### Step 4: Let's look into Deployments
+
+```
+kubectl -n prometheus get deploy 
+```
+
+  * What do they do 
+
+#### Step 5: Let's look into DaemonSets 
+
+```
+kubectl -n prometheus get ds
+## node-exporter runs on every node
+## connects to server, collects data and exports it
+## so it is available for prometheus at the endpoint 
+```
+
+#### Helm -> prometheus stack -> What does it do 
+
+  * Sets up Monitoring Stack
+  * Configuration for your K8s cluster 
+    * Worker Nodes monitored 
+    * K8s components (pods a.s.o) are monitored 
+
+#### Where does configuration come from ? 
+
+```
+## roundabout 31 configmaps 
+kubectl -n prometheus get configmaps 
+
+## also you have secrets (Grafana, Prometheus, Operator)
+kubectl -n prometheus get secrets 
+
+```
+
+#### CRD's were created 
+
+```
+## custom resource definitions 
+kubectl -n prometheus crd 
+## Sehr lang ! 
+kubectl -n prometheus get crd/prometheuses.monitoring.coreos.com -o yaml
+
+```
+
+### Look into the pods to see the image used, how configuration is mounted 
+
+```
+kubectl -n prometheus get sts
+kubectl -n prometheus describe sts/prometheus-prometheus-kube-prometheus-prometheus > prom.yml  
+kubectl -n prometheus describe sts/alertmanager-prometheus-kube-prometheus-alertmanager > alert.yml  
+
+kubectl -n prometheus get deploy 
+kubectl -n prometheus describe deploy/prometheus-kube-prometheus-operator > operator.yml 
+
+## ---> das SECRET erstellt der Kubernetes Operator für uns !
+## First prom.yml 
+##. Mounts:
+##      /etc/prometheus/config from config (rw)
+##  -> What endpoints to scrape 
+## comes from:
+kubectl get -n prometheus secrets prometheus-prometheus-kube-prometheus-prometheus -o jsonpath='{.data.prometheus\.yaml\.gz}' | base64 -d | gunzip > config-prom.yml
+## vi config-prom.yml 
+## Look into the scrape_configs 
+
+```
+
+### Connect to grafana 
+
+```
+## wie ist der port 3000 
+kubectl logs prometheus-grafana-776fb976f7-w9nrp grafana
+## hier nochmal port und auch, wie das secret heisst
+kubectl describe pods prometheus-grafana-776fb976f7-w9nrp | less
+
+## user / pass ? 
+kubectl get -n prometheus secrets prometheus-grafana -o jsonpath='{.data.admin-password}' | base64 -d
+kubectl get -n prometheus secrets prometheus-grafana -o jsonpath='{.data.admin-user}' | base64 -d
+
+## localhost:3000 erreichbarkeit starten -- im Vordergrund
+kubectl port-forward deploy/prometheus-grafana 3000
+## if on remote - system do a ssh-tunnel 
+## ssh -L 3000:127.0.0.1:3000 user@remote-ip 
+
+
+## letzte Schritt: browser aufrufen: http://localhost:3000
+
+
+```
+
+### Reference:
+
+  * Techworld with Nana: [https://www.youtube.com/watch?v=QoDqxm7ybLc](https://youtu.be/QoDqxm7ybLc?t=190)
+
+### exporters mongodb
+
+
+### prometheus - export 
+
+ * https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-mongodb-exporter
+
+
+### Step 1: mongodb - deployment in mongodb namespace
+
+```
+## vi mongo-db-deploy.yml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-deployment
+  labels:
+    app: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo
+        ports:
+        - containerPort: 27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017        
+```
+
+```
+kubectl apply -f mongo-db-deploy.yml
+```
+
+
+### Step 2: Install prometheus - mongodb - export 
+
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm show values prometheus-community/prometheus-mongodb-exporter > values.yml
+
+## adjust so it looks like so:
+vi values.yml 
+## [mongodb[+srv]://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]
+## mongodb-service is the service name
+mongodb:
+  uri: "mongodb://mongodb-service:27017"
+
+serviceMonitor:
+  additionalLabels:
+    release: prometheus 
+```
+
+```
+helm install mongodb-exporter prometheus-community/prometheus-mongodb-exporter -f values.yml
+```
+
+### Step 3: Helm -> template -> What does it do ? 
+
+```
+helm template mongodb-exporter prometheus-community/prometheus-mongodb-exporter -f values.yml
+```
+
+### Good Kubernetes Board for Grafana
+
+
+  * https://github.com/dotdc/grafana-dashboards-kubernetes
+  * https://medium.com/@dotdc/a-set-of-modern-grafana-dashboards-for-kubernetes-4b989c72a4b2
+
+## Kubernetes Tipps & Tricks 
+
+### kubectl kubeconfig mergen
+
+
+### So funktioniert es auch bereits:
+
+```
+## hier werden mehrere kubeconfigs durchsucht 
+export KUBECONFIG=~/.kube/config:/path/cluster1:/path/cluster2
+
+```
+
+### Jetzt alles in eine Datei 
+
+```
+cd ~/.kube
+kubectl config view --flatten > all-in-one-kubeconfig.yaml
+mv config config.old 
+mv all-in-one-kubeconfig.yaml config
+```
+
+### Contexts jeweils anzeigen 
+
+```
+kubectl config 
+kubectl config use-context mycontext
+```
+
+## Kubernetes Certificates (Control Plane) / Security
+
+### vmware - cluster api
+
+  * https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-cluster-lifecycle-secrets.html
+
+### Pod Security Admission (PSA)
+
+
+
+### Seit: 1.2.22 Pod Security Admission 
+
+  * 1.2.22 - ALpha - D.h. ist noch nicht aktiviert und muss als Feature Gate aktiviert (Kind)
+  * 1.2.23 - Beta -> d.h. evtl. aktiviert  
+
+### Vorgefertigte Regelwerke 
+
+  * privileges - keinerlei Einschränkungen 
+  * baseline - einige Einschränkungen 
+  * restricted - sehr streng 
+
+  * Reference: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+
+### Praktisches Beispiel für Version ab 1.2.23 - Problemstellung 
+
+```
+mkdir -p manifests
+cd manifests
+mkdir psa 
+cd psa 
+nano 01-ns.yml 
+```
+
+```
+## Schritt 1: Namespace anlegen 
+## vi 01-ns.yml 
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-ns1
+  labels:
+    # soft version - running but showing complaints 
+    # pod-security.kubernetes.io/enforce: baseline 
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+
+```
+
+```
+kubectl apply -f 01-ns.yml 
+```
+
+```
+## Schritt 2: Testen mit nginx - pod 
+## vi 02-nginx.yml 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace: test-ns1
+spec:
+  containers:
+    - image: nginx
+      name: nginx
+      ports:
+        - containerPort: 80
+
+```
+
+```
+## a lot of warnings will come up 
+## because this image runs as root !! (by default) 
+kubectl apply -f 02-nginx.yml
+```
+
+```
+## Schritt 3:
+## Anpassen der Sicherheitseinstellung (Phase1) im Container 
+
+## vi 02-nginx.yml 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace: test-ns1
+spec:
+  containers:
+    - image: nginx
+      name: nginx
+      ports:
+        - containerPort: 80
+      securityContext:     
+        seccompProfile:    
+          type: RuntimeDefault
+```
+
+```
+kubectl delete -f 02-nginx.yml
+kubectl apply -f 02-nginx.yml
+kubectl -n test-ns1 get pods 
+```
+
+```
+## Schritt 4: 
+## Weitere Anpassung runAsNotRoot 
+## vi 02-nginx.yml 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace: test-ns<tln>
+spec:
+  containers:
+    - image: nginx
+      name: nginx
+      ports:
+        - containerPort: 80
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+
+```
+
+```
+## pod kann erstellt werden, wird aber nicht gestartet 
+kubectl delete -f 02-nginx.yml 
+kubectl apply -f 02-nginx.yml 
+kubectl -n test-ns1 get pods
+kubectl -n test-ns1 describe pods nginx 
+```
+
+```
+## Schritt 4:
+## Anpassen der Sicherheitseinstellung (Phase1) im Container 
+```
+
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace: test-ns1
+spec:
+  containers:
+    - image: nginx
+      name: nginx
+      ports:
+        - containerPort: 80
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+
+```
+
+```
+kubectl delete -f 02-nginx.yml
+kubectl apply -f 02-nginx.yml
+kubectl -n test-ns1 get pods 
+```
+
+
+### Praktisches Beispiel für Version ab 1.2.23 -Lösung - Container als NICHT-Root laufen lassen
+
+  * Wir müssen ein image, dass auch als NICHT-Root laufen kann 
+  * .. oder selbst eines bauen (;o)) 
+  o bei nginx ist das bitnami/nginx 
+ 
+```
+## vi 03-nginx-bitnami.yml 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bitnami-nginx
+  namespace: test-ns1
+spec:
+  containers:
+    - image: bitnami/nginx
+      name: bitnami-nginx
+      ports:
+        - containerPort: 80
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+```
+
+```
+## und er läuft als nicht root 
+kubectl apply -f 03_pod-bitnami.yml 
+kubectl -n test-ns1 get pods
+```
+
+### Pod Security Policy (PSP)
+
+
+### General 
+
+  * PodSecurity is an eine Rolle gebunden (clusterrole)
+  * Deprecated in 1.21 removed in 1.25
+  * From 1.25 on please use PSA (Pod Security Admission) instead 
+
+### Prerequisites 
+
+  * We should have a running Cluster of 1.22/1.23
+
+
+### Walkthrough 
+
+#### Step 1: Create Digitalocean microk8s 1-node - cluster, with this cloud-init-script  
+
+  * cloud-init (ubuntu 20.04 LTS, 8 GB Ram) 
+
+```
+##!/bin/bash 
+
+groupadd sshadmin
+USERS="11trainingdo"
+echo $USERS
+for USER in $USERS
+do
+  echo "Adding user $USER"
+  useradd -s /bin/bash --create-home $USER
+  usermod -aG sshadmin $USER
+  echo "$USER:deinsehrgeheimespasswort" | chpasswd
+done
+
+## We can sudo with 11trainingdo
+usermod -aG sudo 11trainingdo 
+
+## 20.04 and 22.04 this will be in the subfolder
+if [ -f /etc/ssh/sshd_config.d/50-cloud-init.conf ]
+then
+  sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/g" /etc/ssh/sshd_config.d/50-cloud-init.conf
+fi
+
+### both is needed 
+sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/g" /etc/ssh/sshd_config
+
+usermod -aG sshadmin root
+
+## TBD - Delete AllowUsers Entries with sed 
+## otherwice we cannot login by group 
+
+echo "AllowGroups sshadmin" >> /etc/ssh/sshd_config 
+systemctl reload sshd 
+
+echo "Installing microk8s"
+snap install --classic --channel=1.23/stable microk8s
+microk8s enable dns rbac
+echo "alias kubectl='microk8s kubectl'" >> /root/.bashrc
+source ~/.bashrc
+alias kubectl='microk8s kubectl'
+
+## now we need to modify the setting of kube-api-server
+## currently in 1.23 no other admission-plugins are activated
+echo "--enable-admission-plugins=PodSecurityPolicy" >> /var/snap/microk8s/current/args/kube-apiserver
+microk8s stop
+microk8s start
+
+
+```
+
+### Step 2: 
+
+```
+## Setup .kube/config from content
+microk8s config
+```
+
+### Step 3
+
+```
+## rbac.yaml 
+## vi service-account.yml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: training
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: pods-clusterrole
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list", "create"]
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["events"]
+  verbs: ["get", "list"]
+---
+## vi rb-training-ns-default-pods.yml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rolebinding-ns-default-pods
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: pods-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: training
+  namespace: default
+```
+
+### Step 4: Secret aus secrets rauskopiert
+
+```
+kubectl get secrets | grep training-token 
+TOKEN=$(kubectl get secrets training-token-<xyz> -o jsonpath='{.data.token}' |  base64 -d)
+## z.B. TOKEN=$(kubectl get secrets training-token-kjl5m -o jsonpath='{.data.token}' |  base64 -d)
+```
+```
+echo $TOKEN
+kubectl config set-context training-ctx --cluster microk8s-cluster --user training
+kubectl config set-credentials training --token=$TOKEN
+
+```
+
+### Step 5: Apply yaml-manifests for psp - stuff (as admin)
+
+```
+## vi setup.yaml 
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: norootcontainers
+spec:
+  allowPrivilegeEscalation: false
+  allowedHostPaths:
+  - pathPrefix: /dev/null
+    readOnly: true
+  fsGroup:
+    rule: RunAsAny
+  hostPorts:
+  - max: 65535
+    min: 0
+  runAsUser:
+    rule: MustRunAsNonRoot
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: norootcontainers-psp-role
+rules:
+- apiGroups:
+  - policy
+  resourceNames:
+  - norootcontainers
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: norootcontainers-psp-role:training
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: norootcontainers-psp-role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: training
+  namespace: default
+```  
+ 
+### Step 5: Change to training-ctx and apply 
+
+```
+kubectl config use-context training-ctx 
+```
+
+```
+## vi demopod.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demopod
+spec:
+  containers:
+    - name:  demopod
+      image: nginx
+```
+
+```
+kubectl apply -f demopod.yaml
+kubectl get pods ## expecting
+kubectl describe pods demopod 
+```
+
+
+
+
+
+### Reference 
+
+  * https://docs.mirantis.com/mke/3.4/ops/deploy-apps-k8s/pod-security-policies/psp-examples.html
+
+## Kubernetes Network / Firewall 
+
+### Calico/Cilium - nginx example NetworkPolicy
+
+
+```
+## Schritt 1:
+kubectl create ns policy-demo
+kubectl create deployment --namespace=policy-demo nginx --image=nginx:1.21
+kubectl expose --namespace=policy-demo deployment nginx --port=80
+## lassen einen 2. pod laufen mit dem auf den nginx zugreifen 
+kubectl run --namespace=policy-demo access --rm -it --image busybox
+```
+
+```
+## innerhalb der shell 
+## Verbindung möglich 
+wget -q nginx -O -
+```
+```
+## Schritt 2: Policy festlegen, dass kein Ingress-Traffic erlaubt
+## in diesem namespace: policy-demo 
+kubectl create -f - <<EOF
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: default-deny
+  namespace: policy-demo
+spec:
+  podSelector:
+    matchLabels: {}
+EOF
+## lassen einen 2. pod laufen mit dem auf den nginx zugreifen 
+kubectl run --namespace=policy-demo access --rm -ti --image busybox
+```
+
+```
+## innerhalb der shell 
+## keine Verbindung mehr möglich, weil policy greift 
+wget -q nginx -O -
+```
+
+```
+## Schritt 3: Zugriff erlauben von pods mit dem Label run=access 
+kubectl create -f - <<EOF
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: access-nginx
+  namespace: policy-demo
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            run: access
+EOF
+
+## lassen einen 2. pod laufen mit dem auf den nginx zugreifen 
+## pod hat durch run -> access automatisch das label run:access zugewiesen 
+kubectl run --namespace=policy-demo access --rm -ti --image busybox
+```
+
+```
+## innerhalb der shell 
+wget -q nginx -O -
+```
+
+``` 
+kubectl run --namespace=policy-demo no-access --rm -ti --image busybox
+```
+
+```
+## in der shell  
+wget -q nginx -O -
+```
+
+```
+
+kubectl delete ns policy-demo 
+
+```
+
+
+### Ref:
+
+  * https://projectcalico.docs.tigera.io/security/tutorials/kubernetes-policy-basic
+
+### Egress / Ingress Examples with Exercise
+
+
+### Links 
+
+  * https://github.com/ahmetb/kubernetes-network-policy-recipes
+  * https://k8s-examples.container-solutions.com/examples/NetworkPolicy/NetworkPolicy.html
+
+### Example with http (Cilium !!) 
+
+```
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+description: "L7 policy to restrict access to specific HTTP call"
+metadata:
+  name: "rule1"
+spec:
+  endpointSelector:
+    matchLabels:
+      type: l7-test
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        org: client-pod
+    toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+      rules:
+        http:
+        - method: "GET"
+          path: "/discount"
+```          
+   
+### Downside egress (NetworkPolicy - not ciliumnetworkpolicy)
+
+  * No valid api for anything other than IP's and/or Ports
+  * If you want more, you have to use CNI-Plugin specific, e.g. 
+
+#### Example egress with ip's 
+
+```
+## Allow traffic of all pods having the label role:app
+## egress only to a specific ip and port 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: test-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      role: app
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 10.10.0.0/16
+    ports:
+    - protocol: TCP 
+      port: 5432
+```
+
+### Example Advanced Egress (cni-plugin specific) 
+
+#### Cilium (Exercise)
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-static-web
+  labels:
+    webserver: nginx
+spec:
+  containers:
+  - name: web
+    image: nginx
+```
+
+```
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: "fqdn-pprof"
+  # namespace: msp
+spec:
+  endpointSelector:
+    matchLabels:
+      webserver: nginx
+  egress:
+  - toFQDNs:
+    - matchPattern: '*.google.com'
+  - toPorts:
+    - ports:
+      - port: "53"
+        protocol: ANY
+      rules:
+        dns:
+        - matchPattern: '*'
+```
+
+```
+kubectl apply -f .
+kubectl exec -it nginx-static-web -- bash 
+```
+
+```
+## im pod 
+## does work 
+curl -I https://www.google.com
+## does not work 
+curl -I https://www.google.de
+## does not work 
+curl -I https://www.heise.de
+```
+
+#### Calico 
+
+  * Only Calico enterprise 
+    * Calico Enterprise extends Calico’s policy model so that domain names (FQDN / DNS) can be used to allow access from a pod or set of pods (via label selector) to external resources outside of your cluster.
+    * https://projectcalico.docs.tigera.io/security/calico-enterprise/egress-access-controls
+
+#### Using isitio as mesh (e.g. with cilium/calico )
+
+##### Installation of sidecar in calico 
+
+  * https://projectcalico.docs.tigera.io/getting-started/kubernetes/hardway/istio-integration
+
+##### Example 
+
+```
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: test-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      role: app
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 10.10.0.0/16
+    ports:
+    - protocol: TCP 
+      port: 5432
+```
+
+### Mesh / istio
+
+
+### Schaubild 
+
+![istio Schaubild](https://istio.io/latest/docs/examples/virtual-machines/vm-bookinfo.svg)
+
+### Istio 
+
+```
+## Visualization 
+## with kiali (included in istio) 
+https://istio.io/latest/docs/tasks/observability/kiali/kiali-graph.png
+
+## Example 
+## https://istio.io/latest/docs/examples/bookinfo/
+The sidecars are injected in all pods within the namespace by labeling the namespace like so:
+kubectl label namespace default istio-injection=enabled
+
+## Gateway (like Ingress in vanilla Kubernetes) 
+kubectl label namespace default istio-injection=enabled
+```
+
+### istio tls 
+
+ * https://istio.io/latest/docs/ops/configuration/traffic-management/tls-configuration/
+
+
+### istio - the next generation without sidecar 
+
+  * https://istio.io/latest/blog/2022/introducing-ambient-mesh/
+
+## Kubernetes Probes (Liveness and Readiness) 
+
+### Übung Liveness-Probe
+
+
+
+### Übung 1: Liveness (command) 
+
+```
+What does it do ? 
+ 
+* At the beginning pod is ready (first 30 seconds)
+* Check will be done after 5 seconds of pod being startet
+* Check will be done periodically every 5 minutes and will check
+  * for /tmp/healthy
+  * if file is there will return: 0 
+  * if file is not there will return: 1 
+* After 30 seconds container will be killed
+* After 35 seconds container will be restarted
+```
+
+```
+## cd
+## mkdir -p manifests/probes
+## cd manifests/probes 
+## vi 01-pod-liveness-command.yml 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: liveness-exec
+spec:
+  containers:
+  - name: liveness
+    image: busybox
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/healthy; sleep 30; rm -f /tmp/healthy; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy
+      initialDelaySeconds: 5
+      periodSeconds: 5
+```
+
+```
+## apply and test 
+kubectl apply -f 01-pod-liveness-command.yml 
+kubectl describe -l test=liveness pods 
+sleep 30
+kubectl describe -l test=liveness pods 
+sleep 5 
+kubectl describe -l test=liveness pods 
+```
+
+```
+## cleanup
+kubectl delete -f 01-pod-liveness-command.yml
+ 
+``` 
+
+### Übung 2: Liveness Probe (HTTP)
+
+```
+## Step 0: Understanding Prerequisite:
+This is how this image works:
+## after 10 seconds it returns code 500 
+http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+    duration := time.Now().Sub(started)
+    if duration.Seconds() > 10 {
+        w.WriteHeader(500)
+        w.Write([]byte(fmt.Sprintf("error: %v", duration.Seconds())))
+    } else {
+        w.WriteHeader(200)
+        w.Write([]byte("ok"))
+    }
+})
+```
+
+```
+## Step 1: Pod  - manifest 
+## vi 02-pod-liveness-http.yml
+## status-code >=200 and < 400 o.k. 
+## else failure 
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: liveness-http
+spec:
+  containers:
+  - name: liveness
+    image: k8s.gcr.io/liveness
+    args:
+    - /server
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+        httpHeaders:
+        - name: Custom-Header
+          value: Awesome
+      initialDelaySeconds: 3
+      periodSeconds: 3
+```
+
+```
+## Step 2: apply and test
+kubectl apply -f 02-pod-liveness-http.yml
+## after 10 seconds port should have been started 
+sleep 10 
+kubectl describe pod liveness-http
+
+```
+
+
+### Reference:
+ 
+   * https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+
+### Übung Liveness http aus nginx
+
+### Funktionsweise Readiness-Probe vs. Liveness-Probe
+
+
+### Why / Howto / 
+
+  * Readiness checks, if container is ready and if it's not READY 
+    * SENDS NO TRAFFIC to the container   
+  
+
+### Difference to LiveNess 
+
+  * They are configured exactly the same, but use another keyword
+    * readinessProbe instead of livenessProbe 
+
+### Example 
+
+```
+readinessProbe:
+  exec:
+    command:
+    - cat
+    - /tmp/healthy
+  initialDelaySeconds: 5
+  periodSeconds: 5
+```
+
+### Reference 
+
+  * https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-readiness-probes
+
+### Manueller Check readyz endpoint kubernetes api server aus pod
+
+
+### Walkthrough 
+
+```
+kubectl run -it --rm podtester --image=busybox 
+## im pod 
+## um zu sehen mit welchem Port wir uns verbinden können 
+env | grep -i kubernetes 
+## kubernetes liegt als service vor 
+wget -O - https://kubernetes:443/readyz?verbose
+```
+
+### Reference:
+
+  * https://kubernetes.io/docs/reference/using-api/health-checks/
+
+## Kubernetes QoS / Limits / Requests
+
+### Quality of Service - evict pods
+
+
+### Die Class wird auf Basis der Limits und Requests der Container vergeben
+
+#### Request 
+
+```
+Request: Definiert wieviel ein Container mindestens braucht (CPU,memory)
+```
+
+#### Limit 
+
+```
+Limit: Definiert, was ein Container maximal braucht.
+```
+
+#### Wo ?
+
+```
+in spec.containers.resources 
+kubectl explain pod.spec.containers.resources
+
+```
+
+### Art der Typen: 
+
+  * Guaranteed
+  * Burstable
+  * BestEffort 
+
+### Guaranteed 
+
+```
+Type: Guaranteed:
+https://kubernetes.io/docs/tasks/configure-pod-container/quality-service-pod/#create-a-pod-that-gets-assigned-a-qos-class-of-guaranteed
+
+set when limit equals request
+(request: das braucht er,
+limit: das braucht er maximal) 
+
+Garantied ist die höchste Stufe und diese werden bei fehlenden Ressourcen 
+als letztes "evicted"
+
+apiVersion: v1
+
+kind: Pod
+metadata:
+  name: qos-demo
+  namespace: qos-example
+spec:
+  containers:
+  - name: qos-demo-ctr
+    image: nginx
+    resources:
+      limits:
+        memory: "200Mi"
+        cpu: "700m"
+
+      requests:
+        memory: "200Mi"
+        cpu: "700m"
+```
+
+### Referenz  
+
+ * https://home.robusta.dev/blog/kubernetes-memory-limit
+
+
+
+
+
+### Tools to identify LimitRange and Requests
+
+
+### VPA (Vertical Pod Autoscaler) / goldilocks 
+
+```
+## Please only repo updateMode: "off" will do this 
+## Do not use automatic adjustment 
+Example VPA configuration
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: my-app-vpa
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind:       Deployment
+    name:       my-app
+  updatePolicy:
+    updateMode: "off"
+```
+
+  * goldilocks will now make visible instead of kubectl describe vpa 
+  * https://github.com/FairwindsOps/goldilocks
+  * als Basis: https://github.com/kubernetes/autoscaler/
+  * https://www.fairwinds.com/goldilocks
+
+
+## Kubernetes Autoscaling 
+
+### Autoscaling Pods/Deployments
+
+
+### Example: newest version with autoscaling/v2 used to be hpa/v1
+
+#### Prerequisites 
+
+  * Metrics-Server needs to be running 
+
+```
+## Test with
+kubectl top pods 
+```
+
+```
+## Install
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+## after that at will be available in kube-system namespace as pod
+kubectl -n kube-system get pods | grep -i metrics 
+```
+
+#### Step 1: deploy app 
+
+```
+cd
+mkdir -p manifests
+cd manifests
+mkdir hpa 
+cd hpa 
+vi 01-deploy.yaml 
+```
+
+
+```
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello
+  template:
+    metadata:
+      labels:
+        app: hello
+    spec:
+      containers:
+      - name: hello
+        image: k8s.gcr.io/hpa-example
+        resources:
+          requests:
+            cpu: 100m
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: hello
+spec:
+  selector:
+    app: hello
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hello
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hello
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+```
+
+### Step 2: Load Generator 
+
+```
+vi 02-loadgenerator.yml 
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-generator
+  labels:
+    app: load-generator
+spec:
+  replicas: 100
+  selector:
+    matchLabels:
+      app: load-generator
+  template:
+    metadata:
+      name: load-generator
+      labels:
+        app: load-generator
+    spec:
+      containers:
+      - name: load-generator
+        image: busybox
+        command:
+        - /bin/sh
+        - -c
+        - "while true; do wget -q -O- http://hello.default.svc.cluster.local; done"
+
+```
+
+### Downscaling 
+ 
+   * Downscalinng will happen after 5 minutes o
+
+```
+## Adjust down to 1 minute 
+behavior:
+  scaleDown:
+    stabilizationWindowSeconds: 60
+
+```
+
+```
+For scaling down the stabilization window is 300 seconds (or the value of the --horizontal-pod-autoscaler-downscale-stabilization flag if provided)
+```
+
+### Reference 
+
+  * https://docs.digitalocean.com/tutorials/cluster-autoscaling-ca-hpa/
+  * https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/#autoscaling-on-more-specific-metrics
+  * https://medium.com/expedia-group-tech/autoscaling-in-kubernetes-why-doesnt-the-horizontal-pod-autoscaler-work-for-me-5f0094694054
+
+## Kubernetes Deployment Scenarios 
+
+### Deployment green/blue,canary,rolling update
+
+
+### Canary Deployment 
+
+```
+A small group of the user base will see the new application 
+(e.g. 1000 out of 100.000), all the others will still see the old version
+
+From: a canary was used to test if the air was good in the mine 
+(like a test balloon) 
+```
+
+### Blue / Green Deployment 
+
+```
+The current version is the Blue one 
+The new version is the Green one 
+
+New Version (GREEN) will be tested and if it works  
+the traffic will be switch completey to the new version (GREEN) 
+
+Old version can either be deleted or will function as fallback 
+```
+
+### A/B Deployment/Testing 
+
+```
+2 Different versions are online, e.g. to test a new design / new feature 
+You can configure the weight (how much traffic to one or the other) 
+by the number of pods
+```
+
+#### Example Calculation 
+
+```
+e.g. Deployment1: 10 pods
+Deployment2: 5 pods
+
+Both have a common label,
+The service will access them through this label 
+```
+
+### Service Blue/Green
+
+
+### Step 1: Deployment + Service 
+
+```
+## vi blue.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-version-blue
+spec:
+  selector:
+    matchLabels:
+      version: blue
+  replicas: 10 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: nginx
+        version: blue
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+```
+
+```
+## vi green.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-version-green
+spec:
+  selector:
+    matchLabels:
+      version: green
+  replicas: 1 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: nginx
+        version: green
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.22
+        ports:
+        - containerPort: 80
+```
+
+```
+## svc.yml 
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-nginx
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: nginx
+```    
+
+### Step 2: Ingress 
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-config
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    # with the ingress controller from helm, you need to set an annotation 
+    # old version useClassName instead 
+    # otherwice it does not know, which controller to use
+    # kubernetes.io/ingress.class: nginx 
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "app.lab1.t3isp.de"
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: svc-nginx 
+              port:
+                number: 80
+```
+
+```
+kubectl apply -f . 
+```
+
+
+### Praxis-Übung A/B Deployment
+
+
+### Walkthrough 
+
+```
+cd
+cd manifests
+mkdir ab 
+cd ab 
+```
+
+```
+## vi 01-cm-version1.yml 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-version-1
+data:
+  index.html: |
+    <html>
+    <h1>Welcome to Version 1</h1>
+    </br>
+    <h1>Hi! This is a configmap Index file Version 1 </h1>
+    </html>
+```
+
+```
+## vi 02-deployment-v1.yml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deploy-v1
+spec:
+  selector:
+    matchLabels:
+      version: v1
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+        version: v1
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+            - name: nginx-index-file
+              mountPath: /usr/share/nginx/html/
+      volumes:
+      - name: nginx-index-file
+        configMap:
+          name: nginx-version-1
+```
+
+```
+## vi 03-cm-version2.yml 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-version-2
+data:
+  index.html: |
+    <html>
+    <h1>Welcome to Version 2</h1>
+    </br>
+    <h1>Hi! This is a configmap Index file Version 2 </h1>
+    </html>
+```
+
+```
+## vi 04-deployment-v2.yml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deploy-v2
+spec:
+  selector:
+    matchLabels:
+      version: v2
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+        version: v2
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+            - name: nginx-index-file
+              mountPath: /usr/share/nginx/html/
+      volumes:
+      - name: nginx-index-file
+        configMap:
+          name: nginx-version-2
+```
+
+```
+## vi 05-svc.yml 
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-nginx
+  labels:
+    svc: nginx
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: nginx
+```
+
+```
+kubectl apply -f . 
+## get external ip  
+kubectl get nodes -o wide 
+## get port
+kubectl get svc my-nginx -o wide 
+## test it with curl apply it multiple time (at least ten times)
+curl <external-ip>:<node-port>
+```
 
 ## Kubernetes - Misc 
 
@@ -558,270 +3229,6 @@ Flanneld runs if ha-cluster is not enabled. If ha-cluster is enabled, calico is 
 The flannel daemon is started using the arguments in ${SNAP_DATA}/args/flanneld. For more information on the configuration, see the flannel documentation.
 ```
 
-### Calico/Cilium - nginx example NetworkPolicy
-
-
-```
-## Schritt 1:
-kubectl create ns policy-demo
-kubectl create deployment --namespace=policy-demo nginx --image=nginx:1.21
-kubectl expose --namespace=policy-demo deployment nginx --port=80
-## lassen einen 2. pod laufen mit dem auf den nginx zugreifen 
-kubectl run --namespace=policy-demo access --rm -ti --image busybox
-```
-```
-## innerhalb der shell 
-wget -q nginx -O -
-```
-```
-## Schritt 2: Policy festlegen, dass kein Ingress-Traffic erlaubt
-## in diesem namespace: policy-demo 
-kubectl create -f - <<EOF
-kind: NetworkPolicy
-apiVersion: networking.k8s.io/v1
-metadata:
-  name: default-deny
-  namespace: policy-demo
-spec:
-  podSelector:
-    matchLabels: {}
-EOF
-## lassen einen 2. pod laufen mit dem auf den nginx zugreifen 
-kubectl run --namespace=policy-demo access --rm -ti --image busybox
-```
-
-```
-## innerhalb der shell 
-wget -q nginx -O -
-```
-
-```
-## Schritt 3: Zugriff erlauben von pods mit dem Label run=access 
-kubectl create -f - <<EOF
-kind: NetworkPolicy
-apiVersion: networking.k8s.io/v1
-metadata:
-  name: access-nginx
-  namespace: policy-demo
-spec:
-  podSelector:
-    matchLabels:
-      app: nginx
-  ingress:
-    - from:
-      - podSelector:
-          matchLabels:
-            run: access
-EOF
-
-## lassen einen 2. pod laufen mit dem auf den nginx zugreifen 
-## pod hat durch run -> access automatisch das label run:access zugewiesen 
-kubectl run --namespace=policy-demo access --rm -ti --image busybox
-```
-
-```
-## innerhalb der shell 
-wget -q nginx -O -
-```
-
-``` 
-kubectl run --namespace=policy-demo no-access --rm -ti --image busybox
-```
-
-```
-## in der shell  
-wget -q nginx -O -
-```
-
-```
-
-kubectl delete ns policy-demo 
-
-```
-
-
-### Ref:
-
-  * https://projectcalico.docs.tigera.io/security/tutorials/kubernetes-policy-basic
-
-### Beispiele Ingress Egress NetworkPolicy
-
-
-### Links 
-
-  * https://github.com/ahmetb/kubernetes-network-policy-recipes
-  * https://k8s-examples.container-solutions.com/examples/NetworkPolicy/NetworkPolicy.html
-
-### Example with http (Cilium !!) 
-
-```
-apiVersion: "cilium.io/v2"
-kind: CiliumNetworkPolicy
-description: "L7 policy to restrict access to specific HTTP call"
-metadata:
-  name: "rule1"
-spec:
-  endpointSelector:
-    matchLabels:
-      type: l7-test
-  ingress:
-  - fromEndpoints:
-    - matchLabels:
-        org: client-pod
-    toPorts:
-    - ports:
-      - port: "8080"
-        protocol: TCP
-      rules:
-        http:
-        - method: "GET"
-          path: "/discount"
-```          
-   
-### Downside egress 
-
-  * No valid api for anything other than IP's and/or Ports
-  * If you want more, you have to use CNI-Plugin specific, e.g. 
-
-#### Example egress with ip's 
-
-```
-## Allow traffic of all pods having the label role:app
-## egress only to a specific ip and port 
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: test-network-policy
-  namespace: default
-spec:
-  podSelector:
-    matchLabels:
-      role: app
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    - ipBlock:
-        cidr: 10.10.0.0/16
-    ports:
-    - protocol: TCP 
-      port: 5432
-```
-
-### Example Advanced Egress (cni-plugin specific) 
-
-#### Cilium
-
-```
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-static-web
-  labels:
-    webserver: nginx
-spec:
-  containers:
-  - name: web
-    image: nginx
-```
-
-```
-apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
-metadata:
-  name: "fqdn-pprof"
-  # namespace: msp
-spec:
-  endpointSelector:
-    matchLabels:
-      webserver: nginx
-  egress:
-  - toFQDNs:
-    - matchPattern: '*.google.com'
-  - toPorts:
-    - ports:
-      - port: "53"
-        protocol: ANY
-      rules:
-        dns:
-        - matchPattern: '*'
-```
-
-```
-kubectl apply -f .
-```
-
-#### Calico 
-
-  * Only Calico enterprise 
-    * Calico Enterprise extends Calico’s policy model so that domain names (FQDN / DNS) can be used to allow access from a pod or set of pods (via label selector) to external resources outside of your cluster.
-    * https://projectcalico.docs.tigera.io/security/calico-enterprise/egress-access-controls
-
-#### Using isitio as mesh (e.g. with cilium/calico )
-
-##### Installation of sidecar in calico 
-
-  * https://projectcalico.docs.tigera.io/getting-started/kubernetes/hardway/istio-integration
-
-##### Example 
-
-```
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: test-network-policy
-  namespace: default
-spec:
-  podSelector:
-    matchLabels:
-      role: app
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    - ipBlock:
-        cidr: 10.10.0.0/16
-    ports:
-    - protocol: TCP 
-      port: 5432
-```
-
-### Mesh / istio
-
-
-### Schaubild 
-
-![istio Schaubild](https://istio.io/latest/docs/examples/virtual-machines/vm-bookinfo.svg)
-
-### Istio 
-
-```
-## Visualization 
-## with kiali (included in istio) 
-https://istio.io/latest/docs/tasks/observability/kiali/kiali-graph.png
-
-## Example 
-## https://istio.io/latest/docs/examples/bookinfo/
-The sidecars are injected in all pods within the namespace by labeling the namespace like so:
-kubectl label namespace default istio-injection=enabled
-
-## Gateway (like Ingress in vanilla Kubernetes) 
-kubectl label namespace default istio-injection=enabled
-```
-
-### istio tls 
-
- * https://istio.io/latest/docs/ops/configuration/traffic-management/tls-configuration/
-
-
-### istio - the next generation without sidecar 
-
-  * https://istio.io/latest/blog/2022/introducing-ambient-mesh/
-
-### Kubernetes Ports/Protokolle
-
-  * https://kubernetes.io/docs/reference/networking/ports-and-protocols/
-
 ### IPV4/IPV6 Dualstack
 
   * https://kubernetes.io/docs/concepts/services-networking/dual-stack/
@@ -838,8 +3245,6 @@ microk8s enable ingress
 ### Referenz 
 
   * https://microk8s.io/docs/addon-ingress
-
-### DNS - Resolution - Services
 
 ## Kubernetes - Ingress 
 
@@ -900,159 +3305,12 @@ kubectl convert --help
 
   * https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-convert-plugin 
 
-### Netzwerkverbindung zu pod testen
-
-
-### Situation 
-
-```
-Managed Cluster und ich kann nicht auf einzelne Nodes per ssh zugreifen
-```
-
-### Behelf: Eigenen Pod starten mit busybox 
-
-```
-## laengere Version 
-kubectl run podtest --rm -ti --image busybox -- /bin/sh
-```
-
-```
-## kuerzere Version 
-kubectl run podtest --rm -ti --image busybox 
-```
-
-### Example test connection 
-
-```
-## wget befehl zum Kopieren
-wget -O - http://10.244.0.99
-```
-
-```
-## -O -> Output (grosses O (buchstabe)) 
-kubectl run podtest --rm -ti --image busybox -- /bin/sh
-/ # wget -O - http://10.244.0.99
-/ # exit 
-```
-
 ### Curl from pod api-server
 
 
 https://nieldw.medium.com/curling-the-kubernetes-api-server-d7675cfc398c
 
-## Kubernetes Praxis API-Objekte 
-
-### Das Tool kubectl (Devs/Ops) - Spickzettel
-
-
-### Allgemein 
-
-```
-## Zeige Information über das Cluster 
-kubectl cluster-info 
-
-## Welche api-resources gibt es ?
-kubectl api-resources 
-
-## Hilfe zu object und eigenschaften bekommen
-kubectl explain pod 
-kubectl explain pod.metadata
-kubectl explain pod.metadata.name 
-
-```
-
-### Arbeiten mit manifesten 
-
-```
-kubectl apply -f nginx-replicaset.yml 
-## Wie ist aktuell die hinterlegte config im system
-kubectl get -o yaml -f nginx-replicaset.yml 
-
-## Änderung in nginx-replicaset.yml z.B. replicas: 4 
-## dry-run - was wird geändert 
-kubectl diff -f nginx-replicaset.yml 
-
-## anwenden 
-kubectl apply -f nginx-replicaset.yml 
-
-## Alle Objekte aus manifest löschen
-kubectl delete -f nginx-replicaset.yml 
-
-
-```
-
-### Ausgabeformate 
-
-```
-## Ausgabe kann in verschiedenen Formaten erfolgen 
-kubectl get pods -o wide # weitere informationen 
-## im json format
-kubectl get pods -o json 
-
-## gilt natürluch auch für andere kommandos
-kubectl get deploy -o json 
-kubectl get deploy -o yaml 
-
-## get a specific value from the complete json - tree 
-kubectl get node k8s-nue-jo-ff1p1 -o=jsonpath='{.metadata.labels}'
-
-```
-
-
-
-### Zu den Pods 
-
-```
-## Start einen pod // BESSER: direkt manifest verwenden
-## kubectl run podname image=imagename 
-kubectl run nginx image=nginx 
-
-## Pods anzeigen 
-kubectl get pods 
-kubectl get pod
-## Format weitere Information 
-kubectl get pod -o wide 
-## Zeige labels der Pods
-kubectl get pods --show-labels 
-
-## Zeige pods mit einem bestimmten label 
-kubectl get pods -l app=nginx 
-
-## Status eines Pods anzeigen 
-kubectl describe pod nginx 
-
-## Pod löschen 
-kubectl delete pod nginx 
-
-## Kommando in pod ausführen 
-kubectl exec -it nginx -- bash 
-
-```
-
-### Arbeiten mit namespaces 
-
-```
-## Welche namespaces auf dem System 
-kubectl get ns 
-kubectl get namespaces 
-## Standardmäßig wird immer der default namespace verwendet 
-## wenn man kommandos aufruft 
-kubectl get deployments 
-
-## Möchte ich z.B. deployment vom kube-system (installation) aufrufen, 
-## kann ich den namespace angeben
-kubectl get deployments --namespace=kube-system 
-kubectl get deployments -n kube-system 
-
-## wir wollen unseren default namespace ändern 
-kubectl config set-context --current --namespace <dein-namespace>
-```
-
-
-
-### Referenz
-
-  * https://kubernetes.io/de/docs/reference/kubectl/cheatsheet/
+## Kubernetes Praxis API-Objekte
 
 ### kubectl example with run
 
@@ -1086,134 +3344,6 @@ kubectl describe pods foo2
 ### Ref:
 
   * https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#run
-
-### Bauen einer Applikation mit Resource Objekten
-
-
-![Bauen einer Webanwendung](images/WebApp.drawio.png)
-
-### kubectl/manifest/deployments
-
-
-```
-cd
-mkdir -p manifests
-cd manifests
-mkdir 03-deploy
-cd 03-deploy 
-nano deploy.yml 
-```
-
-```
-
-## vi deploy.yml 
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-spec:
-  selector:
-    matchLabels:
-      app: nginx
-  replicas: 8 # tells deployment to run 2 pods matching the template
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.21
-        ports:
-        - containerPort: 80
-        
-```
-
-```
-kubectl apply -f deploy.yml 
-```
-
-### Services - Aufbau
-
-
-![Services Aufbau](/images/kubernetes-services.drawio.svg)
-
-### kubectl/manifest/service
-
-
-### Schritt 1: Deployment 
-
-```
-cd
-mkdir -p manifests
-cd manifests 
-mkdir 04-service 
-cd 04-service 
-```
-
-```
-## 01-deploy.yml 
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: my-nginx
-spec:
-  selector:
-    matchLabels:
-      run: my-nginx
-  replicas: 3
-  template:
-    metadata:
-      labels:
-        run: my-nginx
-    spec:
-      containers:
-      - name: my-nginx
-        image: nginx
-        ports:
-        - containerPort: 80
-```
-
-```
-kubectl apply -f .
-```
-
-### Schritt 2:
-
-
-```
-## 02-svc.yml 
-apiVersion: v1
-kind: Service
-metadata:
-  name: my-nginx
-  labels:
-    svc: nginx
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-  selector:
-    run: my-nginx
-```
-
-```
-kubectl apply -f . 
-```
-
-
-### Ref.
-
-  * https://kubernetes.io/docs/concepts/services-networking/connect-applications-service/
-
-### Hintergrund Ingress
-
-
-
-
-### Ref. / Dokumentation 
-
-  * https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-ingress-guide-nginx-example.html
 
 ### Ingress Controller auf Digitalocean (doks) mit helm installieren
 
@@ -1432,189 +3562,6 @@ spec:
 
 ### Install Ingress On Digitalocean DOKS
 
-### Beispiel mit Hostnamen
-
-
-### Prerequisits
-
-```
-## Ingress Controller muss aktiviert sein 
-### Nur der Fall wenn man microk8s zum Einrichten verwendet 
-### Ubuntu 
-microk8s enable ingress
-```
-
-### Walkthrough 
-
-#### Step 1: pods and services
-
-```
-cd
-mkdir -p manifests
-cd manifests 
-mkdir abi
-cd abi
-```
-
-```
-## apple.yml 
-## vi apple.yml 
-kind: Pod
-apiVersion: v1
-metadata:
-  name: apple-app
-  labels:
-    app: apple
-spec:
-  containers:
-    - name: apple-app
-      image: hashicorp/http-echo
-      args:
-        - "-text=apple-<dein-name>"
----
-
-kind: Service
-apiVersion: v1
-metadata:
-  name: apple-service
-spec:
-  selector:
-    app: apple
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 5678 # Default port for image
-```
-
-```
-kubectl apply -f apple.yml 
-```
-
-```
-## banana
-## vi banana.yml
-kind: Pod
-apiVersion: v1
-metadata:
-  name: banana-app
-  labels:
-    app: banana
-spec:
-  containers:
-    - name: banana-app
-      image: hashicorp/http-echo
-      args:
-        - "-text=banana-<dein-name>"
-
----
-
-kind: Service
-apiVersion: v1
-metadata:
-  name: banana-service
-spec:
-  selector:
-    app: banana
-  ports:
-    - port: 80
-      targetPort: 5678 # Default port for image
-```
-
-```
-kubectl apply -f banana.yml
-```
-
-### Step 2: Ingress 
-
-```
-## Ingress
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: example-ingress
-  annotations:
-    ingress.kubernetes.io/rewrite-target: /
-    # with the ingress controller from helm, you need to set an annotation 
-    # otherwice it does not know, which controller to use
-    # old version... use ingressClassName instead 
-    # kubernetes.io/ingress.class: nginx
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: "<euername>.lab<nr>.t3isp.de"
-    http:
-      paths:
-        - path: /apple
-          backend:
-            serviceName: apple-service
-            servicePort: 80
-        - path: /banana
-          backend:
-            serviceName: banana-service
-            servicePort: 80
-```
-
-```
-## ingress 
-kubectl apply -f ingress.yml
-kubectl get ing 
-```
-
-### Reference 
-
-  * https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-ingress-guide-nginx-example.html
-
-### Find the problem 
-
-```
-## Hints 
-
-## 1. Which resources does our version of kubectl support 
-## Can we find Ingress as "Kind" here.
-kubectl api-ressources 
-
-## 2. Let's see, how the configuration works 
-kubectl explain --api-version=networking.k8s.io/v1 ingress.spec.rules.http.paths.backend.service
-
-## now we can adjust our config 
-```
-
-### Solution
-
-```
-## in kubernetes 1.22.2 - ingress.yml needs to be modified like so.
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: example-ingress
-  annotations:
-    ingress.kubernetes.io/rewrite-target: /
-    # with the ingress controller from helm, you need to set an annotation 
-    # old version useClassName instead 
-    # otherwice it does not know, which controller to use
-    # kubernetes.io/ingress.class: nginx 
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: "app12.lab.t3isp.de"
-    http:
-      paths:
-        - path: /apple
-          pathType: Prefix
-          backend:
-            service:
-              name: apple-service
-              port:
-                number: 80
-        - path: /banana
-          pathType: Prefix
-          backend:
-            service:
-              name: banana-service
-              port:
-                number: 80                
-```
-
 ### Achtung: Ingress mit Helm - annotations
 
 ### Permanente Weiterleitung mit Ingress
@@ -1802,79 +3749,6 @@ kubectl exec -it pod-env-var --  bash
 
  * https://matthewpalmer.net/kubernetes-app-developer/articles/ultimate-configmap-guide-kubernetes.html
 
-### Configmap MariaDB - Example
-
-
-### Schritt 1: configmap 
-
-```
-cd 
-mkdir -p manifests
-cd manifests
-mkdir cftest 
-cd cftest 
-nano 01-configmap.yml 
-```
-
-```
-### 01-configmap.yml
-kind: ConfigMap 
-apiVersion: v1 
-metadata:
-  name: mariadb-configmap 
-data:
-  # als Wertepaare
-  MARIADB_ROOT_PASSWORD: 11abc432
-```
-
-```
-kubectl apply -f .
-kubectl get cm
-kubectl get cm mariadb-configmap -o yaml
-```
-
-
-### Schritt 2: Deployment 
-```
-nano 02-deploy.yml
-```
-
-```
-##deploy.yml 
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: mariadb-deployment
-spec:
-  selector:
-    matchLabels:
-      app: mariadb
-  replicas: 1 
-  template:
-    metadata:
-      labels:
-        app: mariadb
-    spec:
-      containers:
-      - name: mariadb-cont
-        image: mariadb:latest
-        envFrom:
-        - configMapRef:
-            name: mariadb-configmap
-
-```
-
-```
-kubectl apply -f .
-```
-
-### Important Sidenode 
-
-  * If configmap changes, deployment does not know
-  * So kubectl apply -f deploy.yml will not have any effect
-  * to fix, use stakater/reloader: https://github.com/stakater/Reloader
-
-
 ### Configmap MariaDB my.cnf
 
 
@@ -1938,282 +3812,6 @@ spec:
 
 ```
 kubectl apply -f .
-```
-
-## Kubernetes Deployment Scenarios 
-
-### Deployment green/blue,canary,rolling update
-
-
-### Canary Deployment 
-
-```
-A small group of the user base will see the new application 
-(e.g. 1000 out of 100.000), all the others will still see the old version
-
-From: a canary was used to test if the air was good in the mine 
-(like a test balloon) 
-```
-
-### Blue / Green Deployment 
-
-```
-The current version is the Blue one 
-The new version is the Green one 
-
-New Version (GREEN) will be tested and if it works  
-the traffic will be switch completey to the new version (GREEN) 
-
-Old version can either be deleted or will function as fallback 
-```
-
-### A/B Deployment/Testing 
-
-```
-2 Different versions are online, e.g. to test a new design / new feature 
-You can configure the weight (how much traffic to one or the other) 
-by the number of pods
-```
-
-#### Example Calculation 
-
-```
-e.g. Deployment1: 10 pods
-Deployment2: 5 pods
-
-Both have a common label,
-The service will access them through this label 
-```
-
-### Service Blue/Green
-
-
-### Step 1: Deployment + Service 
-
-```
-## vi blue.yml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-version-blue
-spec:
-  selector:
-    matchLabels:
-      version: blue
-  replicas: 10 # tells deployment to run 2 pods matching the template
-  template:
-    metadata:
-      labels:
-        app: nginx
-        version: blue
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.21
-        ports:
-        - containerPort: 80
-```
-
-```
-## vi green.yml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-version-green
-spec:
-  selector:
-    matchLabels:
-      version: green
-  replicas: 1 # tells deployment to run 2 pods matching the template
-  template:
-    metadata:
-      labels:
-        app: nginx
-        version: green
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.22
-        ports:
-        - containerPort: 80
-```
-
-```
-## svc.yml 
-apiVersion: v1
-kind: Service
-metadata:
-  name: svc-nginx
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-  selector:
-    app: nginx
-```    
-
-### Step 2: Ingress 
-
-```
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: ingress-config
-  annotations:
-    ingress.kubernetes.io/rewrite-target: /
-    # with the ingress controller from helm, you need to set an annotation 
-    # old version useClassName instead 
-    # otherwice it does not know, which controller to use
-    # kubernetes.io/ingress.class: nginx 
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: "app.lab1.t3isp.de"
-    http:
-      paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: svc-nginx 
-              port:
-                number: 80
-```
-
-```
-kubectl apply -f . 
-```
-
-
-### Praxis-Übung A/B Deployment
-
-
-### Walkthrough 
-
-```
-cd
-cd manifests
-mkdir ab 
-cd ab 
-```
-
-```
-## vi 01-cm-version1.yml 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: nginx-version-1
-data:
-  index.html: |
-    <html>
-    <h1>Welcome to Version 1</h1>
-    </br>
-    <h1>Hi! This is a configmap Index file Version 1 </h1>
-    </html>
-```
-
-```
-## vi 02-deployment-v1.yml 
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deploy-v1
-spec:
-  selector:
-    matchLabels:
-      version: v1
-  replicas: 2
-  template:
-    metadata:
-      labels:
-        app: nginx
-        version: v1
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-        volumeMounts:
-            - name: nginx-index-file
-              mountPath: /usr/share/nginx/html/
-      volumes:
-      - name: nginx-index-file
-        configMap:
-          name: nginx-version-1
-```
-
-```
-## vi 03-cm-version2.yml 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: nginx-version-2
-data:
-  index.html: |
-    <html>
-    <h1>Welcome to Version 2</h1>
-    </br>
-    <h1>Hi! This is a configmap Index file Version 2 </h1>
-    </html>
-```
-
-```
-## vi 04-deployment-v2.yml 
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deploy-v2
-spec:
-  selector:
-    matchLabels:
-      version: v2
-  replicas: 2
-  template:
-    metadata:
-      labels:
-        app: nginx
-        version: v2
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-        volumeMounts:
-            - name: nginx-index-file
-              mountPath: /usr/share/nginx/html/
-      volumes:
-      - name: nginx-index-file
-        configMap:
-          name: nginx-version-2
-```
-
-```
-## vi 05-svc.yml 
-apiVersion: v1
-kind: Service
-metadata:
-  name: my-nginx
-  labels:
-    svc: nginx
-spec:
-  type: NodePort
-  ports:
-  - port: 80
-    protocol: TCP
-  selector:
-    app: nginx
-```
-
-```
-kubectl apply -f . 
-## get external ip  
-kubectl get nodes -o wide 
-## get port
-kubectl get svc my-nginx -o wide 
-## test it with curl apply it multiple time (at least ten times)
-curl <external-ip>:<node-port>
 ```
 
 ## Helm (Kubernetes Paketmanager) 
@@ -2473,7 +4071,7 @@ kubectl apply -f .
 ```
 
 
-#### Mini-Schritt 2: ClusterRolle festlegen - Dies gilt für alle namespaces, muss aber noch zugewiesen werden
+#### Mini-Schritt 2: ClusterRole festlegen - Dies gilt für alle namespaces, muss aber noch zugewiesen werden
 
 ```
 ### Bevor sie zugewiesen ist, funktioniert sie nicht - da sie keinem Nutzer zugewiesen ist 
@@ -2486,7 +4084,7 @@ metadata:
 rules:
 - apiGroups: [""] # "" indicates the core API group
   resources: ["pods"]
-  verbs: ["get", "watch", "list"]
+  verbs: ["get", "watch", "list", "create"]
 ```
 
 ```
@@ -2521,7 +4119,7 @@ kubectl apply -f rb-training-ns-default-pods.yml
 kubectl auth can-i get pods -n default --as system:serviceaccount:default:training
 ```
 
-### Schritt 2: Context anlegen / Credentials auslesen und in kubeconfig hinterlegen (bis Version 1.25.) 
+### Schritt 2: Context anlegen / Credentials auslesen und in kubeconfig hinterlegen (ab Kubernetes-Version 1.25.) 
 
 #### Mini-Schritt 1: kubeconfig setzen 
 
@@ -2595,64 +4193,6 @@ kubectl rollout restart deploy nginx-deployment
 kubectl rollout undo deploy nginx-deployment 
 
 ```
-
-## Kubernetes QoS 
-
-### Quality of Service - evict pods
-
-
-### Die Class wird auf Basis der Limits und Requests der Container vergeben
-
-```
-Request: Definiert wieviel ein Container mindestens braucht (CPU,memory)
-Limit: Definiert, was ein Container maximal braucht.
-
-in spec.containers.resources 
-kubectl explain pod.spec.containers.resources
-
-```
-
-### Art der Typen: 
-
-  * Guaranteed
-  * Burstable
-  * BestEffort 
-
-### Guaranteed 
-
-```
-Type: Guaranteed:
-https://kubernetes.io/docs/tasks/configure-pod-container/quality-service-pod/#create-a-pod-that-gets-assigned-a-qos-class-of-guaranteed
-
-set when limit equals request
-(request: das braucht er,
-limit: das braucht er maximal) 
-
-Garantied ist die höchste Stufe und diese werden bei fehlenden Ressourcen 
-als letztes "evicted"
-
-apiVersion: v1
-
-kind: Pod
-metadata:
-  name: qos-demo
-  namespace: qos-example
-spec:
-  containers:
-  - name: qos-demo-ctr
-    image: nginx
-    resources:
-      limits:
-        memory: "200Mi"
-        cpu: "700m"
-
-      requests:
-        memory: "200Mi"
-        cpu: "700m"
-```
-
-
-
 
 ## Kustomize 
 
@@ -3022,72 +4562,6 @@ kubectl uncordon n111
   * [Doku Kubernetes Taints and Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   * https://blog.kubecost.com/blog/kubernetes-taints/
 
-### Autoscaling Pods/Deployments
-
-
-### Example: newest version with autoscaling/v2 used to be hpa/v1
-
-```
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: hello
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: hello
-  template:
-    metadata:
-      labels:
-        app: hello
-    spec:
-      containers:
-      - name: hello
-        image: k8s.gcr.io/hpa-example
-        resources:
-          requests:
-            cpu: 100m
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: hello
-spec:
-  selector:
-    app: hello
-  ports:
-    - port: 80
-      targetPort: 80
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: hello
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: hello
-  minReplicas: 2
-  maxReplicas: 20
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 80
-```
-
-  * https://docs.digitalocean.com/tutorials/cluster-autoscaling-ca-hpa/
-
-### Reference 
-
-  * https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/#autoscaling-on-more-specific-metrics
-  * https://medium.com/expedia-group-tech/autoscaling-in-kubernetes-why-doesnt-the-horizontal-pod-autoscaler-work-for-me-5f0094694054
-
 ### pod aus deployment bei config - Änderung neu ausrollen
 
   * https://github.com/stakater/Reloader
@@ -3185,13 +4659,15 @@ kubectl explain pod.spec.containers.securityContext
 ### Seit: 1.2.22 Pod Security Admission 
 
   * 1.2.22 - ALpha - D.h. ist noch nicht aktiviert und muss als Feature Gate aktiviert (Kind)
-  * 1.2.23 - Beta -> d.h. aktiviert  
+  * 1.2.23 - Beta -> d.h. evtl. aktiviert  
 
 ### Vorgefertigte Regelwerke 
 
   * privileges - keinerlei Einschränkungen 
   * baseline - einige Einschränkungen 
   * restricted - sehr streng 
+
+  * Reference: https://kubernetes.io/docs/concepts/security/pod-security-standards/
 
 ### Praktisches Beispiel für Version ab 1.2.23 - Problemstellung 
 
@@ -3212,7 +4688,9 @@ kind: Namespace
 metadata:
   name: test-ns1
   labels:
-    pod-security.kubernetes.io/enforce: baseline
+    # soft version - running but showing complaints 
+    # pod-security.kubernetes.io/enforce: baseline 
+    pod-security.kubernetes.io/enforce: restricted
     pod-security.kubernetes.io/audit: restricted
     pod-security.kubernetes.io/warn: restricted
 
@@ -3242,6 +4720,7 @@ spec:
 
 ```
 ## a lot of warnings will come up 
+## because this image runs as root !! (by default) 
 kubectl apply -f 02-nginx.yml
 ```
 
@@ -3302,6 +4781,41 @@ kubectl apply -f 02-nginx.yml
 kubectl -n test-ns1 get pods
 kubectl -n test-ns1 describe pods nginx 
 ```
+
+```
+## Schritt 4:
+## Anpassen der Sicherheitseinstellung (Phase1) im Container 
+```
+
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace: test-ns1
+spec:
+  containers:
+    - image: nginx
+      name: nginx
+      ports:
+        - containerPort: 80
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+
+```
+
+```
+kubectl delete -f 02-nginx.yml
+kubectl apply -f 02-nginx.yml
+kubectl -n test-ns1 get pods 
+```
+
 
 ### Praktisches Beispiel für Version ab 1.2.23 -Lösung - Container als NICHT-Root laufen lassen
 
@@ -4351,159 +5865,3 @@ kubectl explain pod.spec.containers.securityContext
 ```
 ## Firewall Kubernetes 
 ```
-
-## Kubernetes Probes (Liveness and Readiness) 
-
-### Übung Liveness-Probe
-
-
-
-### Übung 1: Liveness (command) 
-
-```
-What does it do ? 
- 
-* At the beginning pod is ready (first 30 seconds)
-* Check will be done after 5 seconds of pod being startet
-* Check will be done periodically every 5 minutes and will check
-  * for /tmp/healthy
-  * if file is there will return: 0 
-  * if file is not there will return: 1 
-* After 30 seconds container will be killed
-* After 35 seconds container will be restarted
-```
-
-```
-## cd
-## mkdir -p manifests/probes
-## cd manifests/probes 
-## vi 01-pod-liveness-command.yml 
-
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    test: liveness
-  name: liveness-exec
-spec:
-  containers:
-  - name: liveness
-    image: busybox
-    args:
-    - /bin/sh
-    - -c
-    - touch /tmp/healthy; sleep 30; rm -f /tmp/healthy; sleep 600
-    livenessProbe:
-      exec:
-        command:
-        - cat
-        - /tmp/healthy
-      initialDelaySeconds: 5
-      periodSeconds: 5
-```
-
-```
-## apply and test 
-kubectl apply -f 01-pod-liveness-command.yml 
-kubectl describe -l test=liveness pods 
-sleep 30
-kubectl describe -l test=liveness pods 
-sleep 5 
-kubectl describe -l test=liveness pods 
-```
-
-```
-## cleanup
-kubectl delete -f 01-pod-liveness-command.yml
- 
-``` 
-
-### Übung 2: Liveness Probe (HTTP)
-
-```
-## Step 0: Understanding Prerequisite:
-This is how this image works:
-## after 10 seconds it returns code 500 
-http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-    duration := time.Now().Sub(started)
-    if duration.Seconds() > 10 {
-        w.WriteHeader(500)
-        w.Write([]byte(fmt.Sprintf("error: %v", duration.Seconds())))
-    } else {
-        w.WriteHeader(200)
-        w.Write([]byte("ok"))
-    }
-})
-```
-
-```
-## Step 1: Pod  - manifest 
-## vi 02-pod-liveness-http.yml
-## status-code >=200 and < 400 o.k. 
-## else failure 
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    test: liveness
-  name: liveness-http
-spec:
-  containers:
-  - name: liveness
-    image: k8s.gcr.io/liveness
-    args:
-    - /server
-    livenessProbe:
-      httpGet:
-        path: /healthz
-        port: 8080
-        httpHeaders:
-        - name: Custom-Header
-          value: Awesome
-      initialDelaySeconds: 3
-      periodSeconds: 3
-```
-
-```
-## Step 2: apply and test
-kubectl apply -f 02-pod-liveness-http.yml
-## after 10 seconds port should have been started 
-sleep 10 
-kubectl describe pod liveness-http
-
-```
-
-
-### Reference:
- 
-   * https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-
-### Funktionsweise Readiness-Probe vs. Liveness-Probe
-
-
-### Why / Howto / 
-
-  * Readiness checks, if container is ready and if it's not READY 
-    * SENDS NO TRAFFIC to the container   
-  
-
-### Difference to LiveNess 
-
-  * They are configured exactly the same, but use another keyword
-    * readinessProbe instead of livenessProbe 
-
-### Example 
-
-```
-readinessProbe:
-  exec:
-    command:
-    - cat
-    - /tmp/healthy
-  initialDelaySeconds: 5
-  periodSeconds: 5
-```
-
-### Reference 
-
-  * https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-readiness-probes
