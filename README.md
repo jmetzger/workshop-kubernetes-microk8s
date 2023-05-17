@@ -59,6 +59,9 @@
      * [Quality of Service - evict pods](kubernetes/qos-class.md)
      * [Tools to identify LimitRange and Requests](kubernetes/tools-identify-limits-request.md)
 
+  1. Kubernetes Autoscaling 
+     * [Autoscaling Pods/Deployments](/kubernetes/autoscaling.md)
+
 ## Backlog 
 
   1. Kubernetes - Misc 
@@ -118,7 +121,6 @@
      * [Kubernetes Debuggen ClusterIP/PodIP](/tipps-tricks/cluster-ip-debug.md)
      * [Debugging pods](tipps-tricks/debugging-pods.md)
      * [Taints und Tolerations](kubernetes/taints-tolerations.md)
-     * [Autoscaling Pods/Deployments](/kubernetes/autoscaling.md)
      * [pod aus deployment bei config - Änderung neu ausrollen](https://github.com/stakater/Reloader)
 
   1. Kubernetes Advanced 
