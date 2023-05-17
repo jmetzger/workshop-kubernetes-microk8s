@@ -54,8 +54,9 @@
      * [Funktionsweise Readiness-Probe vs. Liveness-Probe](/probes/readiness.md) 
      * [Manueller Check readyz endpoint kubernetes api server aus pod](/probes/readyz-kube-api-curl.md)
 
-  1. Kubernetes QoS 
+  1. Kubernetes QoS / Limits / Requests
      * [Quality of Service - evict pods](kubernetes/qos-class.md)
+     * [Tools to identify Limits and Requests](kubernetes/tools-identify-limits-request.md)
 
 ## Backlog 
 
