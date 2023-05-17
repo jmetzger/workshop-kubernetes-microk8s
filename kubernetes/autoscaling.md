@@ -65,7 +65,7 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 80
+        averageUtilization: 20
 ```
 
 ## Step 2: Load Generator 
