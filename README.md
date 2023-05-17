@@ -42,6 +42,11 @@
      * [Calico/Cilium - nginx example NetworkPolicy](/kubernetes-network/callico/00-simple-example.md)
      * [Egress / Ingress Examples with Exercise](/kubernetes-networks/examples-ingress-egress.md)
 
+  1. Kubernetes Probes (Liveness and Readiness) 
+     * [Übung Liveness-Probe](/probes/uebung-liveness.md)
+     * [Übung Liveness http aus nginx](/probes/exercise-liveness-http-nginx.md)
+     * [Funktionsweise Readiness-Probe vs. Liveness-Probe](/probes/readiness.md) 
+
 ## Backlog 
 
   1. Kubernetes - Misc 
@@ -159,9 +164,7 @@
   1. Kubernetes - Hardening 
      * [Kubernetes Tipps Hardening](kubernetes-security/tipps-hardening.md)
 
-  1. Kubernetes Probes (Liveness and Readiness) 
-     * [Übung Liveness-Probe](/probes/uebung-liveness.md)
-     * [Funktionsweise Readiness-Probe vs. Liveness-Probe](/probes/readiness.md) 
+
        
 
      
