@@ -24,6 +24,12 @@
   
   1. Kubernetes - Wartung / Debugging 
      * [Netzwerkverbindung zu pod testen](/tipps-tricks/verbindung-zu-pod-testen.md)
+
+  1. Kubernetes Backup 
+     [Backups mit Velero](/backups/cluster-backup-velero.md)
+
+  1. Kubernetes Upgrade 
+     * [Upgrade von tanzu (Cluster API)](upgrade/vmware-vsphere-tanzu-tkg.md)
   
   1. Monitoring with Prometheus / Grafana 
      * [Overview](prometheus/overview.md)
