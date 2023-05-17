@@ -63,6 +63,11 @@
   1. Kubernetes Autoscaling 
      * [Autoscaling Pods/Deployments](/kubernetes/autoscaling.md)
 
+  1. Kubernetes Deployment Scenarios 
+     * [Deployment green/blue,canary,rolling update](/kubernetes/deployment-strategies-en.md)
+     * [Service Blue/Green](/kubectl-examples/03c-service-blue-green-nginx.md)
+     * [Praxis-Übung A/B Deployment](/kubectl-examples/08-ab-deployment.md)   
+
 ## Backlog 
 
   1. Kubernetes - Misc 
@@ -95,11 +100,6 @@
      * [Permanente Weiterleitung mit Ingress](/kubectl-examples/05-ingress-permanent-redirect.md)
      * [ConfigMap Example](/kubectl-examples/06-configmap.md)
      * [Configmap MariaDB my.cnf](kubectl-examples/06b-mariadb-configmap-configfile.md)     
-  
-  1. Kubernetes Deployment Scenarios 
-     * [Deployment green/blue,canary,rolling update](/kubernetes/deployment-strategies-en.md)
-     * [Service Blue/Green](/kubectl-examples/03c-service-blue-green-nginx.md)
-     * [Praxis-Übung A/B Deployment](/kubectl-examples/08-ab-deployment.md)   
      
   1. Helm (Kubernetes Paketmanager) 
      * [Helm Grundlagen](/helm/grundlagen.md)
