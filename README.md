@@ -35,6 +35,7 @@
      * [Overview](prometheus/overview.md)
      * [Setup prometheus/Grafana with helm](prometheus/walkthrough-installation-setup.md)
      * [exporters mongodb](prometheus/exporters-and-mongodb.md)
+     * [Good Kubernetes Board for Grafana](prometheus/grafana/good-board.md)
      
   1. Kubernetes Tipps & Tricks 
      * [kubectl kubeconfig mergen](/kubectl/merge-kubeconfig.md)
