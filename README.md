@@ -46,6 +46,7 @@
      * [Übung Liveness-Probe](/probes/uebung-liveness.md)
      * [Übung Liveness http aus nginx](/probes/exercise-liveness-http-nginx.md)
      * [Funktionsweise Readiness-Probe vs. Liveness-Probe](/probes/readiness.md) 
+     * [Manueller Check readyz endpoint kubernetes api server aus pod](/probes/readyz-kube-api-curl.md)
 
 ## Backlog 
 
