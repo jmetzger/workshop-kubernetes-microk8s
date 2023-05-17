@@ -4,6 +4,15 @@
 
 ### Step 1: app 
 
+```
+cd
+mkdir -p manifests
+cd manifests
+mkdir hpa 
+cd hpa 
+vi 01-deploy.yaml 
+```
+
 
 ```
 ---
