@@ -48,6 +48,7 @@
   1. Kubernetes Network / Firewall 
      * [Calico/Cilium - nginx example NetworkPolicy](/kubernetes-network/callico/00-simple-example.md)
      * [Egress / Ingress Examples with Exercise](/kubernetes-networks/examples-ingress-egress.md)
+     * [Mesh / istio](sammlung-istio.md) 
 
   1. Kubernetes Probes (Liveness and Readiness) 
      * [Übung Liveness-Probe](/probes/uebung-liveness.md)
@@ -73,10 +74,6 @@
   1. Kubernetes - Netzwerk (CNI's) / Mesh
      * [Netzwerk Interna](/kubernetes-networks/networking-internal-overview.md)
      * [Übersicht Netzwerke](/kubernetes-networks/overview.md) 
-     * [Calico/Cilium - nginx example NetworkPolicy](/kubernetes-network/callico/00-simple-example.md)
-     * [Beispiele Ingress Egress NetworkPolicy](kubernetes-networks/examples-ingress-egress.md)
-     * [Mesh / istio](sammlung-istio.md)  
-     * [Kubernetes Ports/Protokolle](https://kubernetes.io/docs/reference/networking/ports-and-protocols/)
      * [IPV4/IPV6 Dualstack](https://kubernetes.io/docs/concepts/services-networking/dual-stack/)
      * [Ingress controller in microk8s aktivieren](microk8s/ingress.md) 
 
