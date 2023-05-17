@@ -2,10 +2,21 @@
 
 ## Die Class wird auf Basis der Limits und Requests der Container vergeben
 
+### Request 
+
 ```
 Request: Definiert wieviel ein Container mindestens braucht (CPU,memory)
-Limit: Definiert, was ein Container maximal braucht.
+```
 
+### Limit 
+
+```
+Limit: Definiert, was ein Container maximal braucht.
+```
+
+### Wo ?
+
+```
 in spec.containers.resources 
 kubectl explain pod.spec.containers.resources
 
@@ -49,6 +60,11 @@ spec:
         memory: "200Mi"
         cpu: "700m"
 ```
+
+## Referenz  
+
+ * https://home.robusta.dev/blog/kubernetes-memory-limit
+
 
 
 
