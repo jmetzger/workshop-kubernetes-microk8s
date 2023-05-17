@@ -54,6 +54,9 @@
      * [Funktionsweise Readiness-Probe vs. Liveness-Probe](/probes/readiness.md) 
      * [Manueller Check readyz endpoint kubernetes api server aus pod](/probes/readyz-kube-api-curl.md)
 
+  1. Kubernetes QoS 
+     * [Quality of Service - evict pods](kubernetes/qos-class.md)
+
 ## Backlog 
 
   1. Kubernetes - Misc 
@@ -104,9 +107,6 @@
   1. Kubernetes - RBAC 
      * [Nutzer einrichten microk8s ab kubernetes 1.25](/kubernetes/rbac-create-user-kubernetes-1-25.md)
      * [Tipps&Tricks zu Deploymnent - Rollout](/kubectl/rollout.md) 
-
-  1. Kubernetes QoS 
-     * [Quality of Service - evict pods](kubernetes/qos-class.md)
 
   1. Kustomize 
      * [Kustomize Overlay Beispiel](/kustomize/02-overlay-example.md)
