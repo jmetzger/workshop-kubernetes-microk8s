@@ -2,6 +2,9 @@
 
 ## Example: newest version with autoscaling/v2 used to be hpa/v1
 
+### Step 1: app 
+
+
 ```
 ---
 apiVersion: apps/v1
@@ -55,6 +58,37 @@ spec:
         type: Utilization
         averageUtilization: 80
 ```
+
+## Step 2: Load Generator 
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-generator
+  labels:
+    app: load-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: load-generator
+  template:
+    metadata:
+      name: load-generator
+      labels:
+        app: load-generator
+    spec:
+      containers:
+      - name: load-generator
+        image: busybox
+        command:
+        - /bin/sh
+        - -c
+        - "while true; do wget -q -O- http://hello.default.svc.cluster.local; done"
+
+```
+
 
   * https://docs.digitalocean.com/tutorials/cluster-autoscaling-ca-hpa/
 
