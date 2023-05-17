@@ -56,7 +56,7 @@
 
   1. Kubernetes QoS / Limits / Requests
      * [Quality of Service - evict pods](kubernetes/qos-class.md)
-     * [Tools to identify Limits and Requests](kubernetes/tools-identify-limits-request.md)
+     * [Tools to identify LimitRange and Requests](kubernetes/tools-identify-limits-request.md)
 
 ## Backlog 
 
