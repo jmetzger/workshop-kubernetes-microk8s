@@ -105,15 +105,21 @@ spec:
 ## Downscaling 
  
    * Downscalinng will happen after 5 minutes o
-  
-  
-  * 
+
+```
+# Adjust down to 1 minute 
+behavior:
+  scaleDown:
+    stabilizationWindowSeconds: 60
 
 ```
 
-* https://docs.digitalocean.com/tutorials/cluster-autoscaling-ca-hpa/
+```
+For scaling down the stabilization window is 300 seconds (or the value of the --horizontal-pod-autoscaler-downscale-stabilization flag if provided)
+```
 
 ## Reference 
 
+  * https://docs.digitalocean.com/tutorials/cluster-autoscaling-ca-hpa/
   * https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/#autoscaling-on-more-specific-metrics
   * https://medium.com/expedia-group-tech/autoscaling-in-kubernetes-why-doesnt-the-horizontal-pod-autoscaler-work-for-me-5f0094694054
