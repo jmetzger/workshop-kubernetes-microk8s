@@ -1,4 +1,4 @@
-# Autoscaling 
+# Horizontal Pod Autoscaler (HPA)
 
 ## Example: newest version with autoscaling/v2 used to be hpa/v1
 
