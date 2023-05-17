@@ -71,6 +71,10 @@ spec:
 ## Step 2: Load Generator 
 
 ```
+vi 02-loadgenerator.yml 
+```
+
+```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
