@@ -4880,7 +4880,7 @@ Wenn offen, nur über vordefinierte Zugangswege (und auch nur bestimmte Nutzer)
 
 ## 2. Welche Pod auf welchen anderen Pod (Service) 
 
-ä Egress 
+Egress 
 ## Welche Pods dürfen wohin nach draussen 
 
 ```
@@ -4891,7 +4891,7 @@ Wenn offen, nur über vordefinierte Zugangswege (und auch nur bestimmte Nutzer)
 kein PrivilegeEscalation 
 nur notwendige Capabilities 
 unter einem nicht-root Benutzer laufen lassen
-...
+```
 
 ### Patching 
 
