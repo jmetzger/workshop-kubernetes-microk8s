@@ -65,7 +65,7 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 20
+        averageUtilization: 80
 ```
 
 ## Step 2: Load Generator 
@@ -82,7 +82,7 @@ metadata:
   labels:
     app: load-generator
 spec:
-  replicas: 1
+  replicas: 100
   selector:
     matchLabels:
       app: load-generator
@@ -102,8 +102,16 @@ spec:
 
 ```
 
+## Downscaling 
+ 
+   * Downscalinng will happen after 5 minutes o
+  
+  
+  * 
 
-  * https://docs.digitalocean.com/tutorials/cluster-autoscaling-ca-hpa/
+```
+
+* https://docs.digitalocean.com/tutorials/cluster-autoscaling-ca-hpa/
 
 ## Reference 
 
