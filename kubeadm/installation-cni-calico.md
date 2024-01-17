@@ -22,9 +22,9 @@
 # Important - Servers are not reachable through
 # Domain !! Only IP. 
 controlplane.tln<nr>.t3isp.de 
-worker1.tln<nr>.t3isp.de
-worker2.tln<nr>.t3isp.de
-worker3.tln<nr>.t3isp.de
+worker1.tln<nr>.do.t3isp.de
+worker2.tln<nr>.do.t3isp.de
+worker3.tln<nr>.do.t3isp.de
 ```
 
 ## Step 1: Setup controlnode (login through ssh) 
