@@ -27,7 +27,7 @@ worker2.tln<nr>.t3isp.de
 worker3.tln<nr>.t3isp.de
 ```
 
-## Step 1: Setup Controlnode (on controlnode) 
+## Step 1: Setup controlnode (login through ssh) 
 
 ```
 # This CIDR is the recommendation for calico
@@ -46,3 +46,20 @@ kubeadm init --pod-network-cidr=$CLUSTER_CIDR && \
 
 ```
 
+## Step 2: Setup worker1 - node (login through ssh) 
+
+```
+
+```
+
+## Step 3: Setup worker2 - node (login through ssh) 
+
+```
+
+```
+
+## Step 4: Setup worker3 - node (login through ssh) 
+
+```
+
+```
