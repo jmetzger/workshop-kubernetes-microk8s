@@ -86,3 +86,15 @@ worker1        NotReady   <none>          3m18s   v1.28.6
 worker2        NotReady   <none>          2m10s   v1.28.6
 worker3        NotReady   <none>          60s     v1.28.6
 ```
+
+```
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/tigera-operator.yaml
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/custom-resources.yaml
+kubectl get ns
+kubectl -n calico-system get all
+kubectl -n calico-system get pods -o wide -w 
+```
+
+```
+# After if all pods are up and running -> CTRL + C
+```
