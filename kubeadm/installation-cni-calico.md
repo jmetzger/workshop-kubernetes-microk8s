@@ -43,23 +43,30 @@ kubeadm init --pod-network-cidr=$CLUSTER_CIDR && \
 ```
 # Copy output of join (needed for workers) 
 # e.g. 
-
+kubeadm join 159.89.99.35:6443 --token rpylp0.rdphpzbavdyx3llz \
+        --discovery-token-ca-cert-hash sha256:05d42f2c051a974a27577270e09c77602eeec85523b1815378b815b64cb99932
 ```
 
 ## Step 2: Setup worker1 - node (login through ssh) 
 
 ```
-
+# use join command from Step 1:
+kubeadm join 159.89.99.35:6443 --token rpylp0.rdphpzbavdyx3llz \
+        --discovery-token-ca-cert-hash sha256:05d42f2c051a974a27577270e09c77602eeec85523b1815378b815b64cb99932
 ```
 
 ## Step 3: Setup worker2 - node (login through ssh) 
 
 ```
-
+# use join command from Step 1:
+kubeadm join 159.89.99.35:6443 --token rpylp0.rdphpzbavdyx3llz \
+        --discovery-token-ca-cert-hash sha256:05d42f2c051a974a27577270e09c77602eeec85523b1815378b815b64cb99932
 ```
 
 ## Step 4: Setup worker3 - node (login through ssh) 
 
 ```
-
+# use join command from Step 1:
+kubeadm join 159.89.99.35:6443 --token rpylp0.rdphpzbavdyx3llz \
+        --discovery-token-ca-cert-hash sha256:05d42f2c051a974a27577270e09c77602eeec85523b1815378b815b64cb99932
 ```
