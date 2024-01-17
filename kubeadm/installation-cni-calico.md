@@ -173,6 +173,7 @@ worker3        NotReady   <none>          60s     v1.28.6
 ```
 
 ```
+# Installing calico CNI 
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/tigera-operator.yaml
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/custom-resources.yaml
 kubectl get ns
