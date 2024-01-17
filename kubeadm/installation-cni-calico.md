@@ -46,7 +46,53 @@ usermod -aG sshadmin root
 # otherwice we cannot login by group 
 
 echo "AllowGroups sshadmin" >> /etc/ssh/sshd_config 
-systemctl reload sshd 
+systemctl reload sshd
+
+# Now let us do some generic setup
+echo "Installing kubeadm kubelet kubectl"
+
+### A lot of stuff needs to be done here
+### https://www.linuxtechi.com/install-kubernetes-on-ubuntu-22-04/
+
+# 1. no swap please
+swapoff -a
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+# 2. Loading necessary modules
+echo "overlay" >> /etc/modules-load.d/containerd.conf
+echo "br_netfilter" >> /etc /modules-load.d/containerd.conf
+modprobe overlay
+modprobe br_netfilter
+
+# 3. necessary kernel settings
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/kubernetes.conf
+sysctl --system
+
+# 4. Update the meta-information
+apt-get -y update
+
+# 5. Installing container runtime
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmour -o /etc/apt/trusted.gpg.d/docker.add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"       apt-get install -y containerd.io
+
+# 6. Configure containerd
+containerd config default > /etc/containerd/config.toml
+sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+systemctl restart containerd
+systemctl enable containerd
+
+# 7. Add Kubernetes Repository for Kubernetes
+mkdir -m 755 /etc/apt/keyrings
+apt-get install -y apt-transport-https ca-certificates curl gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/$K8S_VERSION/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/$K8S_VERSI                                                                                                               # 8. Install kubectl kubeadm kubectl
+apt-get -y update
+apt-get install -y kubelet kubeadm kubectl
+apt-mark hold -y kubelet kubeadm kubectl
+
+# 9. Install helm
+snap install helm --classic
+
+# Installing nfs-common
+apt-get -y install nfs-common
 ```
 
 
