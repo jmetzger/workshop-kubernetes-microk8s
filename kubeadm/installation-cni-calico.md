@@ -11,6 +11,45 @@
     * kubeadm, kubelet, kubectl installed
     * containerd - runtime installed 
 
+  * Installed on all nodes (with cloud-init)
+
+```
+#!/bin/bash 
+
+groupadd sshadmin
+USERS="mysupersecretuser"
+SUDO_USER="mysupersecretuser"
+PASS="yoursupersecretpass"
+for USER in $USERS
+do
+  echo "Adding user $USER"
+  useradd -s /bin/bash --create-home $USER
+  usermod -aG sshadmin $USER
+  echo "$USER:$PASS | chpasswd
+done
+
+# We can sudo with $SUDO_USER
+usermod -aG sudo $SUDO_USER
+
+# 20.04 and 22.04 this will be in the subfolder
+if [ -f /etc/ssh/sshd_config.d/50-cloud-init.conf ]
+then
+  sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/g" /etc/ssh/sshd_config.d/50-cloud-init.conf
+fi
+
+## both is needed 
+sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/g" /etc/ssh/sshd_config
+
+usermod -aG sshadmin root
+
+# TBD - Delete AllowUsers Entries with sed 
+# otherwice we cannot login by group 
+
+echo "AllowGroups sshadmin" >> /etc/ssh/sshd_config 
+systemctl reload sshd 
+```
+
+
 ## Prerequisites 
 
   * 4 Servers setup and reachable through ssh.
@@ -97,4 +136,20 @@ kubectl -n calico-system get pods -o wide -w
 
 ```
 # After if all pods are up and running -> CTRL + C
+```
+
+```
+kubectl -n calico-system get pods -o wide
+# all nodes should be ready now 
+kubectl get nodes -o wide 
+```
+
+```
+# Output
+root@controlplane:~# kubectl get nodes
+NAME           STATUS   ROLES           AGE    VERSION
+controlplane   Ready    control-plane   14m    v1.28.6
+worker1        Ready    <none>          11m    v1.28.6
+worker2        Ready    <none>          10m    v1.28.6
+worker3        Ready    <none>          9m9s   v1.28.6
 ```
