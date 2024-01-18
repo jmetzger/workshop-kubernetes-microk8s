@@ -68,7 +68,10 @@
   1. Kubernetes Deployment Scenarios 
      * [Deployment green/blue,canary,rolling update](/kubernetes/deployment-strategies-en.md)
      * [Service Blue/Green](/kubectl-examples/03c-service-blue-green-nginx.md)
-     * [Praxis-Übung A/B Deployment](/kubectl-examples/08-ab-deployment.md)   
+     * [Praxis-Übung A/B Deployment](/kubectl-examples/08-ab-deployment.md)
+    
+  1. Kubernetes Istio
+     * [Istio installieren und Addons bereitsstellen](/istio/install-and-addons.md) 
 
 ## Backlog 
 
