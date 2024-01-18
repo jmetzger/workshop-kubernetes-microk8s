@@ -71,7 +71,8 @@
      * [Praxis-Übung A/B Deployment](/kubectl-examples/08-ab-deployment.md)
     
   1. Kubernetes Istio
-     * [Istio installieren und Addons bereitsstellen](/istio/install-and-addons.md) 
+     * [Istio installieren und Addons bereitsstellen](/istio/install-and-addons.md)
+     * [Auf Kiali zugreifen](/istio/kiali/access.md)
 
 ## Backlog 
 
