@@ -50,7 +50,7 @@ http://localhost:20002
 
 ```
 Für Putty Nutzer (zusätzlich zum ganz normalen Einrichten des Servers)
-Unter SSH Tunnels gehen, Source Port: 20002, Destination: 161.35.64.88:20002
+Unter SSH Tunnels gehen, Source Port: 20002, Destination: 165.227.173.22:20002
 Auf Add klicken
 ```
 
