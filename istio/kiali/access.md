@@ -49,8 +49,8 @@ http://localhost:20002
 ### Variante B 
 
 ```
-Für Putty Nutzer:
-Unter SSH Tunnels gehen, Source Port: 8080, Destination: 161.35.64.88:30080
+Für Putty Nutzer (zusätzlich zum ganz normalen Einrichten des Servers)
+Unter SSH Tunnels gehen, Source Port: 20002, Destination: 161.35.64.88:20002
 Auf Add klicken
 ```
 
