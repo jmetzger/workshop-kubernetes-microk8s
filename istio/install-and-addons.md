@@ -37,7 +37,7 @@ istioctl install --set profile=demo -y
 
 ```
 # Install Add-Ons
-kubectl apply -f istio-1.20.2/bin/samples/add-ons/ 
+kubectl apply -f istio-1.20.2/samples/addons/ 
 ```
 
 ## Step 4: Check if all the corresponding container (from istio and addons) are running 
