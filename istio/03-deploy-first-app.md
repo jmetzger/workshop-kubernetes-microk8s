@@ -124,6 +124,7 @@ kubectl -n tln1 run -it --rm curly --image=curlimages/curl -- sh
 ````
 # within shell of that pod
 # catalog.yourappnamespace/items/1
-curl -s http://catalog.istioapp1/items/1
+curl http://catalog.istioapp-tln1/items/1
+exit
 ```
 
