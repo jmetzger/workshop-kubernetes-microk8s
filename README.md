@@ -10,7 +10,7 @@
   
   1. Installation 
      * [Kubernetes mit der Cluster API aufsetzen](clusterapi/installation.md)
-     * [Kubernetes mit kubadm aufsetzen (calico)](kubeadmin/installation-cni-calico.md)
+     * [Kubernetes mit kubadm aufsetzen (calico)](kubeadm/installation-cni-calico.md)
 
   1. Kubernetes Praxis API-Objekte 
      * [Das Tool kubectl (Devs/Ops) - Spickzettel](/kubectl/spickzettel.md)
