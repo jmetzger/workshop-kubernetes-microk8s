@@ -122,7 +122,9 @@ CLUSTER_CIDR="192.168.0.0/16"
 kubeadm init --pod-network-cidr=$CLUSTER_CIDR && \
   mkdir -p /root/.kube && \
   cp -i /etc/kubernetes/admin.conf /root/.kube/config && \
-  chown $(id -u):$(id -g) /root/.kube/config
+  chown $(id -u):$(id -g) /root/.kube/config && \
+  cp -i /root/.kube/config /tmp/config.kubeadm && \
+  chmod o+r /tmp/config.kubeadm 
 ```
 
 ```
