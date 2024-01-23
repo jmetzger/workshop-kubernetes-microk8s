@@ -60,6 +60,29 @@ spec:
 kubectl apply -f . 
 ```
 
+## Schritt 2b: NodePort 
+
+```
+# 02-svc.yml 
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-nginx
+  labels:
+    svc: nginx
+spec:
+  type: NodePort 
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    run: my-nginx
+```
+
+```
+kubectl apply -f . 
+```
+
 
 ## Ref.
 
