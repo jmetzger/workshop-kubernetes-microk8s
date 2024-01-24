@@ -11,7 +11,7 @@
 
 ```
 kubectl apply -f services/catalog/kubernetes/catalog-deployment-v2.yaml 
-kubectl get pods 
+kubectl get pods  --show-labels 
 ```
 
 ## Schritt 2: Testen 
@@ -30,7 +30,7 @@ while true; do curl -v http://jochen.istio.t3isp.de/api/catalog; sleep .5; done
 cat ingress-virtualservice/catalog-destinationrule.yaml
 kubectl apply -f ingress-virtualservice/catalog-destinationrule.yaml 
 # here we can also see a version label 
-kubectl get pods
+kubectl get pods --show-labels 
 ```
 
 ## Schritt 4: Route all traffic to v1 
