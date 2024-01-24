@@ -10,3 +10,7 @@
   * https://mvallim.github.io/kubernetes-under-the-hood/documentation/haproxy-cluster.html
   * https://www.lisenet.com/2021/install-and-configure-a-multi-master-ha-kubernetes-cluster-with-kubeadm-haproxy-and-keepalived-on-centos-7/
 
+## Aufsetzen eines HA-Cluster (Internal) 
+
+  * https://github.com/kubesphere/kubekey/blob/master/docs/ha-mode.md
+
