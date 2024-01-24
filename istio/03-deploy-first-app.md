@@ -145,7 +145,10 @@ kubectl get pod
 ## Step 8: Verbindung zu webapp testen 
 
 ```
-kubectl -n tln1 run -it --rm curly --image=curlimages/curl -- sh
+# tlnx
+# kubectl -n tlnx run -it --rm curly --image=curlimages/curl -- sh
+# z.B. 
+kubectl -n tln5 run -it --rm curly --image=curlimages/curl -- sh
 ```
 
 ```
