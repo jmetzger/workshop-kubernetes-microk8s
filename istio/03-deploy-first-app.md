@@ -128,10 +128,10 @@ curl http://catalog.istioapp-tln1/items/1
 exit
 ```
 
-## Step 7: Jetzt deployent wir die webapp 
+## Step 7: Jetzt deployen wir die webapp 
 
 ```
-# Wir schauen uns das manifest für dei webapp an
+# Wir schauen uns das manifest für die webapp an
 # und ändern die env-variablen CATALOG_SERVICE_HOST 
 # tlnx durch Eure Teilnehmernummer ersetzen 
 catalog.istioapp-tlnx  
