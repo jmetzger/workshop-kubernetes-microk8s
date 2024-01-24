@@ -13,7 +13,7 @@ cd bin
 
 ```
 # Wir bekommen einen 500er 
-curl -v http://146.190.177.12/api/catalog
+curl -v http://jochen.istio.t3isp.de/api/catalog
 ```
 
 ## Schritt 3: Jetzt nur 50% der Zeit einen Fehler produzieren 
@@ -21,7 +21,7 @@ curl -v http://146.190.177.12/api/catalog
 ```
 ./chaos.sh 500 50
 # und testen 
-while true; do curl -v http://146.190.177.12/api/catalog; sleep .5; done
+while true; do curl -v http://jochen.istio.t3isp.de/api/catalog; sleep .5; done
 ```
 
 ## Schritt 4: Den VirtualService einen retry machen lassen 
@@ -36,7 +36,7 @@ kubectl apply -f ingress-virtualservice/catalog-virtualservice.yaml
 
 ```
 # Jetzt haben wir bessere Ergebnisse
-while true; do curl -v http://146.190.177.12/api/catalog; sleep .5; done
+while true; do curl -v http://jochen.istio.t3isp.de/api/catalog; sleep .5; done
 ```
 
 ## Schritt 5: Wieder Ausgangszustand herstellen 
