@@ -42,7 +42,7 @@ kubectl apply -f ingress-virtualservice/catalog-virtualservice-all-v1.yaml
 
 ```
 # Now we only see v1 responses -> no image
-while true; do curl -v http://146.190.177.12/api/catalog; sleep .5; done
+while true; do curl -v http://jochen.istio.t3isp.de/api/catalog; sleep .5; done
 ```
 
 ## Schritt 5: Now we route it to another service if there is a specific header 
