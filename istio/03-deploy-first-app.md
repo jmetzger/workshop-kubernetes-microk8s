@@ -89,7 +89,7 @@ spec:
 
 ```
 # schauen wir uns das mal mit injection an 
-istiocl kube-inject -f services/catalog/kubernetes/catalog.yaml | less 
+istioctl kube-inject -f services/catalog/kubernetes/catalog.yaml | less 
 ```
 
 ## Step 4: Automatische Injection einrichten. 
