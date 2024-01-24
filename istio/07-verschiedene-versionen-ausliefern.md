@@ -55,6 +55,5 @@ kubectl apply -f ingress-virtualservice/catalog-virtualservice-dark-v2.yaml
 ```
 # Let's test
 # We also get version with image 
-curl -H "x-dark-launch: v2" http://146.190.177.12/api/catalog
+curl -H "x-dark-launch: v2" http://jochen.istio.t3isp.de/api/catalog
 ```
-````  
