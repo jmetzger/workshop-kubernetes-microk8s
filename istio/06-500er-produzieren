@@ -24,7 +24,22 @@ curl -v http://146.190.177.12/api/catalog
 while true; do curl -v http://146.190.177.12/api/catalog; sleep .5; done
 ```
 
-## Schritt 4: Wieder Ausgangszustand herstellen 
+## Schritt 4: Den VirtualService einen retry machen lassen 
+
+```
+# 2s timeout 3x wiederholen 
+# retries:
+#   attempts: 3
+#   perTryTimeout: 2s 
+kubectl apply -f ingress-virtualservice/catalog-virtualservice.yaml 
+```
+
+```
+# Jetzt haben wir bessere Ergebnisse
+while true; do curl -v http://146.190.177.12/api/catalog; sleep .5; done
+```
+
+## Schritt 5: Wieder Ausgangszustand herstellen 
 
 ```
 ./chaos.sh 500 delete 
