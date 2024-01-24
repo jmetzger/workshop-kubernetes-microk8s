@@ -81,6 +81,7 @@
      * [Istio installieren und Addons bereitsstellen](istio/01-install-and-addons.md)
      * [Istion Überblick - egress und ingress - gateway](/istio/02-overview-ingress-egress-gateway.md)
      * [Istio - Deployment of simple application](istio/03-deploy-first-app.md)
+     * [Istio - Grafana Dashboard](istio/04-grafana-dashboard.md)
 
 ## Backlog 
 
