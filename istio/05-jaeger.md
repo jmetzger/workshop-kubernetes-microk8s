@@ -14,6 +14,8 @@ Destination: localhost:16686
 ## Schritt 2: Jaeger öffnen 
 
 ```
+# ssh tunnel aufbauen - portwarding
+
 # Im Browser:
 http://localhost:16686
 ```
@@ -26,4 +28,3 @@ http://localhost:16686
 # Oben einen Punkt anklicken
 ```
 
-```
