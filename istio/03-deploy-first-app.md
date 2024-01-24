@@ -223,7 +223,7 @@ kubectl get virtualservice -o yaml
 ```
 ## Wichtiger Hinweis, auf beiden Seiten ingressgateway und vor dem Pod des Dienstes Webapp
 ## Sitzt ein envoy-proxy und kann Telemetrie-Daten und Insight sammeln was zwischen den
-## applicationen passiert -> das passiert über ein sidecar in jeder Applikatiin 
+## applicationen passiert -> das passiert über ein sidecar in jeder Applikation 
 
 ## Wichtig: Das passiert alles ausserhalb der Applikation
 ## Nicht wie früher z.B. bei Netflix innerhalb z.B. für die Sprache Java
