@@ -1,14 +1,22 @@
 # Renew Certs 
 
+## Zertifikate überprüfen 
+
+```
+kubeadm certs check-expiration
 ```
 
+```
 . Wo werden Zertifikate benötigt ?
 
 - zum kube-apiserver hin von den einzelnen Komponenten 
 - zum 
 usw. 
+```
 
+## Sonderrolle 
 
+```
 b. Sonderrolle kubelet
 
 Macht ein automatisches Renew the certifikate über die 
@@ -22,17 +30,25 @@ Diese muss aktiviert sein:
 
 https://kubernetes.io/docs/tasks/tls/certificate-rotation/
 --rotate-certificates 
+```
 
+```
 root@worker1:/var/lib/kubelet# grep -r "rotate" config.yaml
 rotateCertificates: true
+```
 
+## Zertifikatserneuerung 
 
+### Schritt 1: 
+
+```
 c. Wir erneuern wir Zertifikate ? 
 
 Wichtig: Das muss auf allen Control-Nodes passieren, wenn sie kurz vor dem ablaufen sind.
 
 auf dem controlplane (bspw. api-server) 
 kubeadm certs renew apiserver 
+```
 
 ## Wichtig, kein kubectl delete po verwenden .
 command output may be misleading in describing static pods: even if it shows that the static pod restarted recently, the correspondent pod containers were not restarted.
