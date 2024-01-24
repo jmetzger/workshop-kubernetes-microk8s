@@ -50,8 +50,14 @@ auf dem controlplane (bspw. api-server)
 kubeadm certs renew apiserver 
 ```
 
+### Schritt 2:
+
+```
+# nochmal gucken, welches Zertfikat genommen
+echo | openssl s_client -showcerts -connect 64.226.76.200:6443 -servername api 2>/dev/null | openssl x509 -noout -enddate
+
 ## Wichtig, kein kubectl delete po verwenden .
-command output may be misleading in describing static pods: even if it shows that the static pod restarted recently, the correspondent pod containers were not restarted.
+# command output may be misleading in describing static pods: even if it shows that the static pod restarted recently, the correspondent pod containers were not restarted.
 
 # dann das manifests wegschieben
 cd /etc/kubernetes/manifests/
@@ -59,22 +65,37 @@ mv kube-apiserver.yaml /tmp
 
 # will not work anymore, because apiserver is not running
 kubectl -n kube-system get pods 
-export CONTAINER_RUNTIME_ENDPOINT=unix:///var/run/containerd/containerd.sock
-crictl pods
 
-# taucht nicht mehr auf -> ap 
+```
+
+### Schritt 3: mit low-level tools checken pod noch läuft / weieder läuft 
+
+```
+export CONTAINER_RUNTIME_ENDPOINT=unix:///var/run/containerd/containerd.sock
+# taucht nicht mehr auf -> apiservre 
+crictl pods
+```
+
+```
 mv /tmp/kube-apiserver.yaml . 
 crictl pods | grep api
+
 
 kubectl get nodes 
 
 kubeadm certs check-expiration | grep "apiserver "
 apiserver                  Jan 23, 2025 04:09 UTC   364d            ca                      no
+```
 
+```
 echo | openssl s_client -showcerts -connect  64.226.76.200:6443 -servername api 2>/dev/null | openssl x509 -noout -enddate
 notAfter=Jan 23 04:09:04 2025 GMT
+```
 
-d. Zertifikate erneuern ohne Downtime 
+
+## Zertifikate ohne Downtime 
+
+
 
 Das wird nur funktionieren, wenn mir eine HA-Cluster haben.
 Dort gibt es mehrere Controlplanes und wir haben einen LoadBalancer davor.
