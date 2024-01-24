@@ -142,4 +142,79 @@ kubectl apply -f services/webapp/kubernetes/webapp.yaml
 kubectl get pod
 ```
 
+## Step 8: Verbindung zu webapp testen 
 
+```
+kubectl -n tln1 run -it --rm curly --image=curlimages/curl -- sh
+```
+
+```
+# Within shell connect to webapp
+curl -s http://webapp.istioapp-tln1/api/catalog/items/1
+exit
+```
+
+```
+# Wir können es aber auch visualisieren
+kubectl port-forward deploy/webapp 8080:8080
+# z.B. Teilnehmer tln1 -> 8081:8080
+
+# WICHTIG Jeder Teilneher sollte hier einen abweichenden Port nehmen 
+# Jetzt lokal noch einen Tunnel aufbauen
+# s. Anleitung Putty
+# Source Port: 8080 # das ist der auf dem Rechner 
+# Destination: localhost:8080
+# Add
+# Achtung -> danach noch Session speichern
+```
+
+```
+# Jetzt im Browser http://localhost:8080
+# aufrufen
+```
+
+## Step 9: Ingress - Gateway konfigurieren (ähnlich wie Ingress-Objekt) 
+
+```
+# wir schauen uns das vorher mal an 
+```
+
+```
+# namespace - fähig, d.h. ein Gateway mit gleichem Namen pro Namespace möglich 
+kubectl apply -f ingress-virtualservice/ingress-gateway.yaml
+```
+
+## Step 10: Reach it from outside 
+
+```
+# We need to find the loadbalancer IP
+kubectl -n istio-system get svc 
+# in unserem Fall
+146.190.177.12
+
+# Wir können jetzt also das System von extern erreichen
+# vomn client aus, oder direkt über den Browser 
+curl -i 146.190.177.12/api/catalog/items/1
+```
+
+```
+# Wir können auch über istioctl direkt überprüfen, ob es einen Routen-Config gibt
+istioctl proxy-config routes deploy/istio-ingressgateway.istio-system
+
+# Falls das nicht funktioniert, können wir auch überprüfen ob ein gateway und ein virtualservice installiert wurde
+kubectl get gateway
+kubectl get virtualservice
+# Kurzform des Services reicht, weil im gleichen namespace
+# Wo soll es hingehen -> == -> Upstream 
+# route -> destination -> host -> webapp 
+kubectl get virtualservice -o yaml 
+```
+
+```
+## Wichtiger Hinweis, auf beiden Seiten ingressgateway und vor dem Pod des Dienstes Webapp
+## Sitzt ein envoy-proxy und kann telemetire daten und insight sammeln was zwischen den
+## applicationen passiert -> das passiert über ein sidecar in jeder Applikatiin 
+
+## Wichtig: Das passiert alles ausserhalb der Applikation
+## Nicht wie früher z.B. bei Netflix innerhalb z.B. für die Sprache Java
+```
