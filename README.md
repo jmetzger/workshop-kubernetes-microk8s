@@ -9,8 +9,8 @@
      * [kubelet garbage collection](kubelet-garbage-collection.md)
 
   1. Kubernetes Controlplane
-    * [Renew Certificate](kubernetes-controlplane/renew-certs.md)
-    * [HA-Cluster](kubernetes-controlplane/ha-cluster.md)
+     * [Renew Certificate](kubernetes-controlplane/renew-certs.md)
+     * [HA-Cluster](kubernetes-controlplane/ha-cluster.md)
   
   1. Installation 
      * [Kubernetes mit der Cluster API aufsetzen](clusterapi/installation.md)
