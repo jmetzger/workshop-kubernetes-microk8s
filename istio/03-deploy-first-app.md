@@ -113,7 +113,7 @@ kubectl apply -f services/catalog/kubernetes/catalog.yaml
 kubectl get pods 
 ```
 
-## Step 6: Now you will try to reach that catalog 
+## Step 6: Wir wollen den Catalog jetzt erreichen 
 
 ```
 # do it from your namespace, e.g. tlnx 
@@ -121,10 +121,25 @@ kubectl get pods
 kubectl -n tln1 run -it --rm curly --image=curlimages/curl -- sh
 ```
 
-````
+```
 # within shell of that pod
 # catalog.yourappnamespace/items/1
 curl http://catalog.istioapp-tln1/items/1
 exit
 ```
+
+## Step 7: Jetzt deployent wir die webapp 
+
+```
+# Wir schauen uns das manifest für dei webapp an
+# und ändern die env-variablen CATALOG_SERVICE_HOST 
+# tlnx durch Eure Teilnehmernummer ersetzen 
+catalog.istioapp-tlnx  
+```
+
+```
+kubectl apply -f services/webapp/kubernetes/webapp.yaml 
+kubectl get pod
+```
+
 
