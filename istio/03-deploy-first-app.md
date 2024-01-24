@@ -159,14 +159,14 @@ exit
 
 ```
 # Wir können es aber auch visualisieren
-kubectl port-forward deploy/webapp 8080:8080
-# z.B. Teilnehmer tln1 -> 8081:8080
+kubectl port-forward deploy/webapp 8001:8080
+# z.B. Teilnehmer tln1 -> 8001:8080
 
 # WICHTIG Jeder Teilneher sollte hier einen abweichenden Port nehmen 
 # Jetzt lokal noch einen Tunnel aufbauen
 # s. Anleitung Putty
 # Source Port: 8080 # das ist der auf dem Rechner 
-# Destination: localhost:8080
+# Destination: localhost:8001
 # Add
 # Achtung -> danach noch Session speichern
 ```
