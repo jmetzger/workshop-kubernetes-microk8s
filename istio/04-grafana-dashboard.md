@@ -22,7 +22,7 @@ http://localhost:3000
 ```
 # Lass uns mal Traffic hinschicken vom Client aus
 # ip vom ingressgateway from loadBalancer 
-while true; do curl http://146.190.177.12/api/catalog; sleep .5; done 
+while true; do curl http://jochen.istio.t3isp.de/api/catalog; sleep .5; done 
 
 # Und das das Dashboard nochmal refreshend
 #-> General ausklappen 
