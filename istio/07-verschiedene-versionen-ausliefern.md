@@ -19,7 +19,7 @@ kubectl get pods
 ```
 # Das sie gleiche am gleichen Server hängen, werden sie "teilweise" abwechselnd
 # angezeigt
-while true; do curl -v http://146.190.177.12/api/catalog; sleep .5; done
+while true; do curl -v http://jochen.istio.t3isp.de/api/catalog; sleep .5; done
 ```
 
 ## Schritt 3: DestinationRule - 2 verschiedene Versionen bekannt machen 
