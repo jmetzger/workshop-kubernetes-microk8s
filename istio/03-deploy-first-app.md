@@ -185,6 +185,8 @@ kubectl port-forward deploy/webapp 8001:8080
 ```
 # namespace - fähig, d.h. ein Gateway mit gleichem Namen pro Namespace möglich 
 cat ingress-virtualservice/ingress-gateway.yaml
+# hier bitte bei Hosts hostname eintragen, der für t3isp.de verwendet, und zwar
+# jeder Teilnehmer eine eigene Subdomain:  z.B. jochen.istio.t3isp.de 
 kubectl apply -f ingress-virtualservice/ingress-gateway.yaml
 ```
 
@@ -195,10 +197,14 @@ kubectl apply -f ingress-virtualservice/ingress-gateway.yaml
 kubectl -n istio-system get svc 
 # in unserem Fall
 146.190.177.12
+# Das trägt Jochen dns t3isp.de ein. 
 
 # Wir können jetzt also das System von extern erreichen
 # vomn client aus, oder direkt über den Browser 
-curl -i 146.190.177.12/api/catalog/items/1
+#curl -i 146.190.177.12/api/catalog/items/1
+# Hier hostname statt ip einträgen
+curl -i http://tlnx.istio.t3isp.de/api/catalog/items/1 
+
 ```
 
 ```
@@ -216,7 +222,7 @@ kubectl get virtualservice -o yaml
 
 ```
 ## Wichtiger Hinweis, auf beiden Seiten ingressgateway und vor dem Pod des Dienstes Webapp
-## Sitzt ein envoy-proxy und kann telemetire daten und insight sammeln was zwischen den
+## Sitzt ein envoy-proxy und kann Telemetrie-Daten und Insight sammeln was zwischen den
 ## applicationen passiert -> das passiert über ein sidecar in jeder Applikatiin 
 
 ## Wichtig: Das passiert alles ausserhalb der Applikation
