@@ -7,5 +7,6 @@
 ## Aufsetzen eines HA-Clusters (auf vm's oder Metall)
 
   * https://kubesphere.io/docs/v3.4/installing-on-linux/high-availability-configurations/set-up-ha-cluster-using-keepalived-haproxy/
-  * https://mvallim.github.io/kubernetes-under-the-hood/documentation/haproxy-cluster.html  
+  * https://mvallim.github.io/kubernetes-under-the-hood/documentation/haproxy-cluster.html
+  * https://www.lisenet.com/2021/install-and-configure-a-multi-master-ha-kubernetes-cluster-with-kubeadm-haproxy-and-keepalived-on-centos-7/
 
