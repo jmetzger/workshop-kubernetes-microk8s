@@ -184,6 +184,7 @@ kubectl port-forward deploy/webapp 8001:8080
 
 ```
 # namespace - fähig, d.h. ein Gateway mit gleichem Namen pro Namespace möglich 
+cat ingress-virtualservice/ingress-gateway.yaml
 kubectl apply -f ingress-virtualservice/ingress-gateway.yaml
 ```
 
