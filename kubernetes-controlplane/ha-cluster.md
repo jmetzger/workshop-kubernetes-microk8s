@@ -14,3 +14,7 @@
 
   * https://github.com/kubesphere/kubekey/blob/master/docs/ha-mode.md
 
+## Varianten den LoadBalancer zu platzieren 
+
+  * https://github.com/kubernetes/kubeadm/blob/main/docs/ha-considerations.md
+
