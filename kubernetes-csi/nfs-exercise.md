@@ -8,6 +8,23 @@
 curl -skSL https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/v4.6.0/deploy/install-driver.sh | bash -s v4.6.0 --
 ```
 
+### Step 2: Storage Class 
+
+```
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-csi
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: 10.135.0.67
+  share: /var/nfs/tln1
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+mountOptions:
+  - nfsvers=3
+```
+
 
 ## Reference:
 
