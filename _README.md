@@ -7,9 +7,14 @@
      * [Structure Kubernetes Deep Dive](https://github.com/jmetzger/training-kubernetes-advanced/assets/1933318/1ca0d174-f354-43b2-81cc-67af8498b56c)
      * [Ports und Protokolle](https://kubernetes.io/docs/reference/networking/ports-and-protocols/)
      * [kubelet garbage collection](#kubelet-garbage-collection)
+
+  1. Kubernetes Controlplane
+     * [Renew Certificate](#renew-certificate)
+     * [HA-Cluster](#ha-cluster)
   
   1. Installation 
      * [Kubernetes mit der Cluster API aufsetzen](#kubernetes-mit-der-cluster-api-aufsetzen)
+     * [Kubernetes mit kubadm aufsetzen (calico)](#kubernetes-mit-kubadm-aufsetzen-calico)
 
   1. Kubernetes Praxis API-Objekte 
      * [Das Tool kubectl (Devs/Ops) - Spickzettel](#das-tool-kubectl-devsops---spickzettel)
@@ -22,6 +27,9 @@
      * [Hintergrund Ingress](#hintergrund-ingress)
      * [Beispiel mit Hostnamen](#beispiel-mit-hostnamen)
      * [Configmap MariaDB - Example](#configmap-mariadb---example)
+    
+  1. Kubernetes - Probes
+     * [Überblick Probes](#überblick-probes)
   
   1. Kubernetes - Wartung / Debugging 
      * [Netzwerkverbindung zu pod testen](#netzwerkverbindung-zu-pod-testen)
@@ -68,6 +76,13 @@
      * [Deployment green/blue,canary,rolling update](#deployment-greenbluecanaryrolling-update)
      * [Service Blue/Green](#service-bluegreen)
      * [Praxis-Übung A/B Deployment](#praxis-übung-ab-deployment)
+    
+  1. Kubernetes Istio
+     * [Istio vs. Ingress Überblick](#istio-vs-ingress-überblick)
+     * [Istio installieren und Addons bereitsstellen](#istio-installieren-und-addons-bereitsstellen)
+     * [Istion Überblick - egress und ingress - gateway](#istion-überblick---egress-und-ingress---gateway)
+     * [Istio - Deployment of simple application](#istio---deployment-of-simple-application)
+     * [Istio - Grafana Dashboard](#istio---grafana-dashboard)
 
 ## Backlog 
 
@@ -298,6 +313,141 @@ kubectl run nginx --image nginx
 ctr images list | grep nginx 
 ```
 
+## Kubernetes Controlplane
+
+### Renew Certificate
+
+
+### Zertifikate überprüfen 
+
+```
+kubeadm certs check-expiration
+```
+
+```
+. Wo werden Zertifikate benötigt ?
+
+- zum kube-apiserver hin von den einzelnen Komponenten 
+- zum 
+usw. 
+```
+
+### Sonderrolle 
+
+```
+b. Sonderrolle kubelet
+
+Macht ein automatisches Renew the certifikate über die 
+Zertifikat api. Schritte:
+
+
+Es erfolgt ein automatisches Approval des Signing Requests
+über den Controller Manager 
+
+Diese muss aktiviert sein:
+
+https://kubernetes.io/docs/tasks/tls/certificate-rotation/
+--rotate-certificates 
+```
+
+```
+root@worker1:/var/lib/kubelet# grep -r "rotate" config.yaml
+rotateCertificates: true
+```
+
+### Zertifikatserneuerung 
+
+#### Schritt 1: 
+
+```
+c. Wir erneuern wir Zertifikate ? 
+
+Wichtig: Das muss auf allen Control-Nodes passieren, wenn sie kurz vor dem ablaufen sind.
+
+auf dem controlplane (bspw. api-server) 
+kubeadm certs renew apiserver 
+```
+
+#### Schritt 2:
+
+```
+## nochmal gucken, welches Zertfikat genommen
+echo | openssl s_client -showcerts -connect 64.226.76.200:6443 -servername api 2>/dev/null | openssl x509 -noout -enddate
+
+### Wichtig, kein kubectl delete po verwenden .
+## command output may be misleading in describing static pods: even if it shows that the static pod restarted recently, the correspondent pod containers were not restarted.
+
+## dann das manifests wegschieben
+cd /etc/kubernetes/manifests/
+mv kube-apiserver.yaml /tmp 
+
+## will not work anymore, because apiserver is not running
+kubectl -n kube-system get pods 
+
+```
+
+#### Schritt 3: mit low-level tools checken pod noch läuft / weieder läuft 
+
+```
+export CONTAINER_RUNTIME_ENDPOINT=unix:///var/run/containerd/containerd.sock
+## taucht nicht mehr auf -> apiservre 
+crictl pods
+```
+
+```
+mv /tmp/kube-apiserver.yaml . 
+crictl pods | grep api
+
+
+kubectl get nodes 
+
+kubeadm certs check-expiration | grep "apiserver "
+apiserver                  Jan 23, 2025 04:09 UTC   364d            ca                      no
+```
+
+```
+echo | openssl s_client -showcerts -connect  64.226.76.200:6443 -servername api 2>/dev/null | openssl x509 -noout -enddate
+notAfter=Jan 23 04:09:04 2025 GMT
+```
+
+
+### Zertifikate ohne Downtime 
+
+
+
+Das wird nur funktionieren, wenn mir eine HA-Cluster haben.
+Dort gibt es mehrere Controlplanes und wir haben einen LoadBalancer davor.
+-> hier vielleicht noch ein Schaubild zeigen.
+
+Ansonsten muss immer der kube-api-server neu gestartet werden und die einzelnen 
+Komponenten, hier haben wir immer eine kurze Downtime. 
+
+Dies wird durch ein HA-Cluster vermieden. Dort ist ein LoadBalancer davorgeschaltet.
+
+```
+
+### HA-Cluster
+
+
+### Übersicht 
+
+![image](https://github.com/jmetzger/training-kubernetes-advanced/assets/1933318/9f791d15-8c97-4f07-862b-cc2bf6035dc0)
+
+### Aufsetzen eines HA-Clusters (auf vm's oder Metall)
+
+  * https://kubesphere.io/docs/v3.4/installing-on-linux/high-availability-configurations/set-up-ha-cluster-using-keepalived-haproxy/
+  * https://mvallim.github.io/kubernetes-under-the-hood/documentation/haproxy-cluster.html
+  * https://www.lisenet.com/2021/install-and-configure-a-multi-master-ha-kubernetes-cluster-with-kubeadm-haproxy-and-keepalived-on-centos-7/
+
+### Aufsetzen eines HA-Cluster (Internal) 
+
+  * https://github.com/kubesphere/kubekey/blob/master/docs/ha-mode.md
+
+### Varianten den LoadBalancer zu platzieren 
+
+  * https://github.com/kubernetes/kubeadm/blob/main/docs/ha-considerations.md
+
+
 ## Installation 
 
 ### Kubernetes mit der Cluster API aufsetzen
@@ -475,6 +625,212 @@ kubectl --kubeconfig kubeconfig.yaml apply -f https://docs.projectcalico.org/v3.
 ## Wait a while, now you will see, the nodes are ready
 kubectl --kubeconfig kubeconfig.yaml get nodes 
 ``` 
+
+### Kubernetes mit kubadm aufsetzen (calico)
+
+
+### Version 
+
+  * Ubuntu 20.04 LTS 
+
+### Done for you 
+
+  * Servers are setup:
+    * ssh-running
+    * kubeadm, kubelet, kubectl installed
+    * containerd - runtime installed 
+
+  * Installed on all nodes (with cloud-init)
+
+```
+##!/bin/bash 
+
+groupadd sshadmin
+USERS="mysupersecretuser"
+SUDO_USER="mysupersecretuser"
+PASS="yoursupersecretpass"
+for USER in $USERS
+do
+  echo "Adding user $USER"
+  useradd -s /bin/bash --create-home $USER
+  usermod -aG sshadmin $USER
+  echo "$USER:$PASS | chpasswd
+done
+
+## We can sudo with $SUDO_USER
+usermod -aG sudo $SUDO_USER
+
+## 20.04 and 22.04 this will be in the subfolder
+if [ -f /etc/ssh/sshd_config.d/50-cloud-init.conf ]
+then
+  sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/g" /etc/ssh/sshd_config.d/50-cloud-init.conf
+fi
+
+### both is needed 
+sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/g" /etc/ssh/sshd_config
+
+usermod -aG sshadmin root
+
+## TBD - Delete AllowUsers Entries with sed 
+## otherwice we cannot login by group 
+
+echo "AllowGroups sshadmin" >> /etc/ssh/sshd_config 
+systemctl reload sshd
+
+## Now let us do some generic setup
+echo "Installing kubeadm kubelet kubectl"
+
+#### A lot of stuff needs to be done here
+#### https://www.linuxtechi.com/install-kubernetes-on-ubuntu-22-04/
+
+## 1. no swap please
+swapoff -a
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+## 2. Loading necessary modules
+echo "overlay" >> /etc/modules-load.d/containerd.conf
+echo "br_netfilter" >> /etc /modules-load.d/containerd.conf
+modprobe overlay
+modprobe br_netfilter
+
+## 3. necessary kernel settings
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/kubernetes.conf
+sysctl --system
+
+## 4. Update the meta-information
+apt-get -y update
+
+## 5. Installing container runtime
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmour -o /etc/apt/trusted.gpg.d/docker.add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"       apt-get install -y containerd.io
+
+## 6. Configure containerd
+containerd config default > /etc/containerd/config.toml
+sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+systemctl restart containerd
+systemctl enable containerd
+
+## 7. Add Kubernetes Repository for Kubernetes
+mkdir -m 755 /etc/apt/keyrings
+apt-get install -y apt-transport-https ca-certificates curl gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/$K8S_VERSION/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/$K8S_VERSI                                                                                                               # 8. Install kubectl kubeadm kubectl
+apt-get -y update
+apt-get install -y kubelet kubeadm kubectl
+apt-mark hold -y kubelet kubeadm kubectl
+
+## 9. Install helm
+snap install helm --classic
+
+## Installing nfs-common
+apt-get -y install nfs-common
+```
+
+
+### Prerequisites 
+
+  * 4 Servers setup and reachable through ssh.
+  * user: 11trainingdo
+  * pass: PLEASE ask your instructor 
+
+
+```
+## Important - Servers are not reachable through
+## Domain !! Only IP. 
+controlplane.tln<nr>.t3isp.de 
+worker1.tln<nr>.do.t3isp.de
+worker2.tln<nr>.do.t3isp.de
+worker3.tln<nr>.do.t3isp.de
+```
+
+### Step 1: Setup controlnode (login through ssh) 
+
+```
+## This CIDR is the recommendation for calico
+## Other CNI's might be different 
+CLUSTER_CIDR="192.168.0.0/16"
+
+kubeadm init --pod-network-cidr=$CLUSTER_CIDR && \
+  mkdir -p /root/.kube && \
+  cp -i /etc/kubernetes/admin.conf /root/.kube/config && \
+  chown $(id -u):$(id -g) /root/.kube/config && \
+  cp -i /root/.kube/config /tmp/config.kubeadm && \
+  chmod o+r /tmp/config.kubeadm 
+```
+
+```
+## Copy output of join (needed for workers) 
+## e.g. 
+kubeadm join 159.89.99.35:6443 --token rpylp0.rdphpzbavdyx3llz \
+        --discovery-token-ca-cert-hash sha256:05d42f2c051a974a27577270e09c77602eeec85523b1815378b815b64cb99932
+```
+
+### Step 2: Setup worker1 - node (login through ssh) 
+
+```
+## use join command from Step 1:
+kubeadm join 159.89.99.35:6443 --token rpylp0.rdphpzbavdyx3llz \
+        --discovery-token-ca-cert-hash sha256:05d42f2c051a974a27577270e09c77602eeec85523b1815378b815b64cb99932
+```
+
+### Step 3: Setup worker2 - node (login through ssh) 
+
+```
+## use join command from Step 1:
+kubeadm join 159.89.99.35:6443 --token rpylp0.rdphpzbavdyx3llz \
+        --discovery-token-ca-cert-hash sha256:05d42f2c051a974a27577270e09c77602eeec85523b1815378b815b64cb99932
+```
+
+### Step 4: Setup worker3 - node (login through ssh) 
+
+```
+## use join command from Step 1:
+kubeadm join 159.89.99.35:6443 --token rpylp0.rdphpzbavdyx3llz \
+        --discovery-token-ca-cert-hash sha256:05d42f2c051a974a27577270e09c77602eeec85523b1815378b815b64cb99932
+```
+
+### Step 5: CNI-Setup (calico) on controlnode (login through ssh) 
+
+```
+kubectl get nodes 
+```
+
+```
+## Output
+root@controlplane:~# kubectl get nodes
+NAME           STATUS     ROLES           AGE     VERSION
+controlplane   NotReady   control-plane   6m27s   v1.28.6
+worker1        NotReady   <none>          3m18s   v1.28.6
+worker2        NotReady   <none>          2m10s   v1.28.6
+worker3        NotReady   <none>          60s     v1.28.6
+```
+
+```
+## Installing calico CNI 
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/tigera-operator.yaml
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/custom-resources.yaml
+kubectl get ns
+kubectl -n calico-system get all
+kubectl -n calico-system get pods -o wide -w 
+```
+
+```
+## After if all pods are up and running -> CTRL + C
+```
+
+```
+kubectl -n calico-system get pods -o wide
+## all nodes should be ready now 
+kubectl get nodes -o wide 
+```
+
+```
+## Output
+root@controlplane:~# kubectl get nodes
+NAME           STATUS   ROLES           AGE    VERSION
+controlplane   Ready    control-plane   14m    v1.28.6
+worker1        Ready    <none>          11m    v1.28.6
+worker2        Ready    <none>          10m    v1.28.6
+worker3        Ready    <none>          9m9s   v1.28.6
+```
 
 ## Kubernetes Praxis API-Objekte 
 
@@ -693,6 +1049,29 @@ metadata:
   labels:
     svc: nginx
 spec:
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    run: my-nginx
+```
+
+```
+kubectl apply -f . 
+```
+
+### Schritt 2b: NodePort 
+
+```
+## 02-svc.yml 
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-nginx
+  labels:
+    svc: nginx
+spec:
+  type: NodePort 
   ports:
   - port: 80
     protocol: TCP
@@ -1015,6 +1394,35 @@ kubectl apply -f .
   * So kubectl apply -f deploy.yml will not have any effect
   * to fix, use stakater/reloader: https://github.com/stakater/Reloader
 
+
+## Kubernetes - Probes
+
+### Überblick Probes
+
+
+### Welche Probes gibt es ? 
+
+  * startup (probe) 
+  * liveness (probe)
+  * readiness (probe)
+
+### Wo werden die Probes definiert ? 
+
+  * Die Probes werden immer auf Container-Ebene definiert
+
+#### Liveness Probe 
+
+##### Was ist das Standardverhalten (wenn keine Liveness Probe existiert) 
+
+  * Es muss ein Prozess mit der id 1 laufen (das ist tatsächlich alles)
+
+
+#### Readiness Probe 
+
+##### Was ist das Standardverhalten (Es muss ein Prozess mit der id 
+
+
+### Wann brauche ich die start
 
 ## Kubernetes - Wartung / Debugging 
 
@@ -2227,11 +2635,13 @@ What does it do ?
 ```
 
 ```
-## cd
-## mkdir -p manifests/probes
-## cd manifests/probes 
+cd
+mkdir -p manifests/probes
+cd manifests/probes 
 ## vi 01-pod-liveness-command.yml 
+```
 
+```
 apiVersion: v1
 kind: Pod
 metadata:
@@ -2612,9 +3022,30 @@ spec:
 
 ```
 ## Adjust down to 1 minute 
-behavior:
-  scaleDown:
-    stabilizationWindowSeconds: 60
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hello
+spec:
+  # change to 60 secs here 
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 60
+  # end of behaviour change
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hello
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+
 
 ```
 
@@ -2902,6 +3333,330 @@ kubectl get nodes -o wide
 kubectl get svc my-nginx -o wide 
 ## test it with curl apply it multiple time (at least ten times)
 curl <external-ip>:<node-port>
+```
+
+## Kubernetes Istio
+
+### Istio vs. Ingress Überblick
+
+
+![Schaubild](/images/Istio-vs-Ingress-Istio-vs.-IngressController.drawio.png)
+
+### Istio installieren und Addons bereitsstellen
+
+
+### On the client (where you also use kubectl) 
+
+#### Steps 1: Download install and run 
+
+```
+## as tlnx - user 
+## find a decent where to run the installation
+## not perfect, but better than to put it in home-folder
+cd 
+mkdir -p manifests/istio
+cd manifests/istio
+```
+
+```
+## now download the install an run the shell
+curl -L https://istio.io/downloadIstio | sh -
+```
+
+### Step 2: Run istioctl - commands (version-check, precheck and install) 
+
+```
+## This istioctl will be under istio-1.20.2/bin
+## but TRAINER has already installed it under /usr/bin/istioctl
+## So we can use that one !! 
+```
+
+```
+## cd istio-1.20.2/bin
+istioctl version
+istioctl x precheck 
+istioctl install --set profile=demo -y
+```
+
+### Step 3: Install the addons 
+
+```
+## Install Add-Ons
+kubectl apply -f istio-1.20.2/samples/addons/ 
+```
+
+### Step 4: Check if all the corresponding container (from istio and addons) are running 
+
+```
+kubectl -n istio-system get pods 
+```
+
+### Istion Überblick - egress und ingress - gateway
+
+
+![image](https://github.com/jmetzger/training-kubernetes-advanced/assets/1933318/c02c7154-cb9a-4253-8232-6cd125f2862c)
+
+### Istio - Deployment of simple application
+
+
+### Overview (what we want to do) 
+
+![image](https://github.com/jmetzger/training-kubernetes-advanced/assets/1933318/285fc65a-57ec-425f-bcd7-729777f79a7d)
+
+  * Catalog Service is reachable through api
+
+### Step 1: Vorbereitung - repo mit beispielen klonen 
+
+```
+cd
+git clone https://github.com/jmetzger/istio-exercises/
+cd istio-exercises 
+```
+
+### Step 2: Eigenen Namespace erstellen 
+
+```
+## Jeder Teilnehmer erstellt seinen eigenen Namespace
+## z.B. istioapp-tlnx
+## d.h. für Teilnehmer 5 (tln5) -> istioapp-tln5
+kubectl create ns istioapp-tln5 
+## Context so einstellen, dass dieser namespace verwendet
+kubectl config set-context --current --namespace istioapp-tln5 
+```
+
+### Step 3: Anwendung untersuchen / istioctl kube-inject 
+
+  * Ihr könnt unten direkt den Pfad nehmen, das ist einfacher ;o) 
+
+```
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: catalog
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: catalog
+  name: catalog
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: catalog
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: catalog
+    version: v1
+  name: catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalog
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: catalog
+        version: v1
+    spec: 
+      serviceAccountName: catalog
+      containers:
+      - env:
+        - name: KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: istioinaction/catalog:latest
+        imagePullPolicy: IfNotPresent
+        name: catalog
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        securityContext:
+          privileged: false
+```
+
+```
+## schauen wir uns das mal mit injection an 
+istioctl kube-inject -f services/catalog/kubernetes/catalog.yaml | less 
+```
+
+### Step 4: Automatische Injection einrichten. 
+
+```
+## kubectl label namespace istioapp-tlnx istio-injection=enabled 
+## z.B
+kubectl label namespace istioapp-tln1 istio-injection=enabled 
+```
+
+### Step 5: catalog ausrollen 
+
+```
+kubectl apply -f services/catalog/kubernetes/catalog.yaml
+```
+
+```
+## Prüfen, ob wirklich 2 container in einem pod laufen,
+## dann funktioniert die Injection
+## WORKS, Yeah !
+kubectl get pods 
+```
+
+### Step 6: Wir wollen den Catalog jetzt erreichen 
+
+```
+## do it from your namespace, e.g. tlnx 
+## z.B. 
+kubectl -n tln1 run -it --rm curly --image=curlimages/curl -- sh
+```
+
+```
+## within shell of that pod
+## catalog.yourappnamespace/items/1
+curl http://catalog.istioapp-tln1/items/1
+exit
+```
+
+### Step 7: Jetzt deployen wir die webapp 
+
+```
+## Wir schauen uns das manifest für die webapp an
+## und ändern die env-variablen CATALOG_SERVICE_HOST 
+## tlnx durch Eure Teilnehmernummer ersetzen 
+catalog.istioapp-tlnx  
+```
+
+```
+kubectl apply -f services/webapp/kubernetes/webapp.yaml 
+kubectl get pod
+```
+
+### Step 8: Verbindung zu webapp testen 
+
+```
+## tlnx
+## kubectl -n tlnx run -it --rm curly --image=curlimages/curl -- sh
+## z.B. 
+kubectl -n tln5 run -it --rm curly --image=curlimages/curl -- sh
+```
+
+```
+## Within shell connect to webapp
+curl -s http://webapp.istioapp-tln1/api/catalog/items/1
+exit
+```
+
+```
+## Wir können es aber auch visualisieren
+kubectl port-forward deploy/webapp 8001:8080
+## z.B. Teilnehmer tln1 -> 8001:8080
+
+## WICHTIG Jeder Teilneher sollte hier einen abweichenden Port nehmen 
+## Jetzt lokal noch einen Tunnel aufbauen
+## s. Anleitung Putty
+## Source Port: 8080 # das ist der auf dem Rechner 
+## Destination: localhost:8001
+## Add
+## Achtung -> danach noch Session speichern
+```
+
+```
+## Jetzt im Browser http://localhost:8080
+## aufrufen
+```
+
+### Step 9: Ingress - Gateway konfigurieren (ähnlich wie Ingress-Objekt) 
+
+```
+## wir schauen uns das vorher mal an 
+```
+
+```
+## namespace - fähig, d.h. ein Gateway mit gleichem Namen pro Namespace möglich 
+cat ingress-virtualservice/ingress-gateway.yaml
+## hier bitte bei Hosts hostname eintragen, der für t3isp.de verwendet, und zwar
+## jeder Teilnehmer eine eigene Subdomain:  z.B. jochen.istio.t3isp.de 
+kubectl apply -f ingress-virtualservice/ingress-gateway.yaml
+```
+
+### Step 10: Reach it from outside 
+
+```
+## We need to find the loadbalancer IP
+kubectl -n istio-system get svc 
+## in unserem Fall
+146.190.177.12
+## Das trägt Jochen dns t3isp.de ein. 
+
+## Wir können jetzt also das System von extern erreichen
+## vomn client aus, oder direkt über den Browser 
+##curl -i 146.190.177.12/api/catalog/items/1
+## Hier hostname statt ip einträgen
+curl -i http://tlnx.istio.t3isp.de/api/catalog/items/1 
+
+```
+
+```
+## Wir können auch über istioctl direkt überprüfen, ob es einen Routen-Config gibt
+istioctl proxy-config routes deploy/istio-ingressgateway.istio-system
+
+## Falls das nicht funktioniert, können wir auch überprüfen ob ein gateway und ein virtualservice installiert wurde
+kubectl get gateway
+kubectl get virtualservice
+## Kurzform des Services reicht, weil im gleichen namespace
+## Wo soll es hingehen -> == -> Upstream 
+## route -> destination -> host -> webapp 
+kubectl get virtualservice -o yaml 
+```
+
+```
+### Wichtiger Hinweis, auf beiden Seiten ingressgateway und vor dem Pod des Dienstes Webapp
+### Sitzt ein envoy-proxy und kann Telemetrie-Daten und Insight sammeln was zwischen den
+### applicationen passiert -> das passiert über ein sidecar in jeder Applikation 
+
+### Wichtig: Das passiert alles ausserhalb der Applikation
+### Nicht wie früher z.B. bei Netflix innerhalb z.B. für die Sprache Java
+```
+
+### Istio - Grafana Dashboard
+
+
+### Status
+
+  * Wir haben bereits mit den Addons Grafana ausgerollt,
+  * Dieses wollen wir jetzt aktivieren
+
+### Schritt 1: Dashboard aktivieren -> achtung jeder nimmt seinen eigenen Port 
+
+```
+## um Grunde macht das auch nur ein port - forward 
+## Das macht der Trainer nur 1x, dann können alle dort zugreifen
+istioctl dashboard grafana --port=3000 --browser=false
+```
+
+```
+## Jetzt über den Browser öffnen
+http://localhost:3000
+## Dann Dashboard -> istio -> istio services
+```
+
+```
+## Lass uns mal Traffic hinschicken vom Client aus
+## ip vom ingressgateway from loadBalancer 
+while true; do curl http://jochen.istio.t3isp.de/api/catalog; sleep .5; done 
+
+## Und das das Dashboard nochmal refreshend
+##-> General ausklappen 
 ```
 
 ## Kubernetes - Misc 
