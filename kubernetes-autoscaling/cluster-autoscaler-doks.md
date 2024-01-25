@@ -56,6 +56,12 @@ spec:
         averageUtilization: 80
 ```
 
+```
+kubectl apply -f .
+kubectl describe hpa hello # Check HPA status
+kubectl get configmap cluster-autoscaler-status -n kube-system -oyaml # Check CA status
+```
+
 ## Reference  
 
   * Reference: https://docs.digitalocean.com/products/kubernetes/how-to/set-up-autoscaling/
