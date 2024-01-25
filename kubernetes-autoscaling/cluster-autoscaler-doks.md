@@ -57,6 +57,37 @@ spec:
 ```
 
 ```
+# loadmaker
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-generator
+  labels:
+    app: load-generator
+spec:
+  replicas: 100
+  selector:
+    matchLabels:
+      app: load-generator
+  template:
+    metadata:
+      name: load-generator
+      labels:
+        app: load-generator
+    spec:
+      containers:
+      - name: load-generator
+        image: busybox
+        command:
+        - /bin/sh
+        - -c
+        - "while true; do wget -q -O- http://hello; done"
+
+
+
+```
+
+```
 kubectl apply -f .
 kubectl describe hpa hello # Check HPA status
 kubectl get configmap cluster-autoscaler-status -n kube-system -oyaml # Check CA status
