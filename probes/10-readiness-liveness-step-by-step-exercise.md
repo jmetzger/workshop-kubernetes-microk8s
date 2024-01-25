@@ -100,13 +100,14 @@ spec:
 
 ```
 kubectl apply -f .
-
+kubectl exec -it deployment/nginxtest -- rm /usr/share/nginx/html/index.html
+# keine endpunkte mehr eingetragen 
 kubectl describe svc nginx-test
 kubectl run --rm -it podtester --image=busybox
-
 ```
 
 ```
+# über cluster-ip nicht erreichbar
 wget -O - http://nginx-test 
 ```
 
