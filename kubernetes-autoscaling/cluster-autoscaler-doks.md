@@ -2,4 +2,6 @@
 
 
 
-## Reference: https://docs.digitalocean.com/products/kubernetes/how-to/set-up-autoscaling/
+## Reference  
+
+  * Reference: https://docs.digitalocean.com/products/kubernetes/how-to/set-up-autoscaling/
