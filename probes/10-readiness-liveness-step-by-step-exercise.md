@@ -51,6 +51,7 @@ spec:
 
 ```
 # Delete the index.html
+kubectl apply -f .
 kubectl exec -it deployment/nginxtest -- rm /usr/share/nginx/html/index.html 
 ```
 
