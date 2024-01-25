@@ -42,6 +42,31 @@ spec:
   storageClassName: nfs-csi
 ```
 
+## Step 4: Pod 
+
+```
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nginx-nfs
+spec:
+  containers:
+    - image: nginx:1.23
+      name: nginx-nfs
+      command:
+        - "/bin/bash"
+        - "-c"
+        - set -euo pipefail; while true; do echo $(date) >> /mnt/nfs/outfile; sleep 1; done
+      volumeMounts:
+        - name: persistent-storage
+          mountPath: "/mnt/nfs"
+          readOnly: false
+  volumes:
+    - name: persistent-storage
+      persistentVolumeClaim:
+        claimName: pvc-nfs-dynamic
+```
+
 
 ## Reference:
 
