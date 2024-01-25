@@ -77,11 +77,10 @@ kubectl get crontab
 kubectl get crontab -o yaml
 ```
 
-### Step 3: new version + old objects still there ?  
+### Step 2: new version + old objects still there ?  
 
 ```
-# vi 03-crd.yaml 
-# vi 01-crd.yaml 
+# vi 02-crd.yaml 
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -125,16 +124,6 @@ spec:
     # shortNames allow shorter string to match your resource on the CLI
     shortNames:
     - ct
-```
-
-```
-kubectl apply -f .
-# not possible because there is an older version
-# first 
-kubectl delete -f 01-crd.yaml
-kubectl apply -f .
-# but now the old object is gone
-kubectl get crontab
 ```
 
 ## Take the patch approach (Try 1) 
