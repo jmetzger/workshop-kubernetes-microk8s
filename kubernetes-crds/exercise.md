@@ -52,6 +52,8 @@ spec:
     # shortNames allow shorter string to match your resource on the CLI
     shortNames:
     - ct
-
+```
 
 ## Ref:
+
+  * https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
