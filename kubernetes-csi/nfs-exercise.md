@@ -25,6 +25,23 @@ mountOptions:
   - nfsvers=3
 ```
 
+## Step 3: Persistent Volume Claim 
+
+```
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-nfs-dynamic
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: nfs-csi
+```
+
 
 ## Reference:
 
