@@ -98,6 +98,17 @@ spec:
 
 ```
 
+```
+kubectl apply -f .
+
+kubectl describe svc nginx-test
+kubectl run --rm -it podtester --image=busybox
+
+```
+
+```
+wget -O - http://nginx-test 
+```
 
 ### Step 3: Now also introduce a liveness probe (to have a recreation of container) 
 
