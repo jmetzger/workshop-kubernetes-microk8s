@@ -36,7 +36,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: liveness
+  name: nginx-test
 spec:
   type: ClusterIP
   ports:
