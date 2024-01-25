@@ -57,11 +57,15 @@ kubectl exec -it deployment/nginxtest -- rm /usr/share/nginx/html/index.html
 
 ```
 # Endpoint is still available but will produce an 404
-kubectl get svc nginx 
-kubectl run --rm podtester --image=busybox -- wget -O - http://nginx  
-
+kubectl get svc nginx-test
+kubectl describe svc nginx-test 
+kubectl run --rm -it podtester --image=busybox 
 ```
-
+```
+#
+wget -O - http://nginx-test  
+exit
+```
 
 ## Step 2: Add a readiness - test and re
 
