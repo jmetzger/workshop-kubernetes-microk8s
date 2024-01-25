@@ -124,9 +124,30 @@ spec:
 
 ```
 # Adjust down to 1 minute 
-behavior:
-  scaleDown:
-    stabilizationWindowSeconds: 60
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hello
+spec:
+  # change to 60 secs here 
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 60
+  # end of behaviour change
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hello
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+
 
 ```
 
