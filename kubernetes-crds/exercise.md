@@ -1,6 +1,6 @@
 # CRD - Exercise 
 
-## Create hour own crd 
+## Create our own crd 
 
 ### Step 1:
 
@@ -127,7 +127,44 @@ spec:
     - ct
 ```
 
+```
+kubectl apply -f .
+# not possible because there is an older version
+# first 
+kubectl delete -f 01-crd.yaml
+kubectl apply -f .
+# but now the old object is gone
+kubectl get crontab
+```
 
+## Take the patch approach (Try 1) 
+
+```
+kubectl patch customresourcedefinitions crontabs.stable.example.com --subresource='status' --type='merge' -p '{"status":{"storedVersions":["v2"]}}'
+kubectl replace -f 02-crd.yaml
+kubectl get crontab 
+```
+
+## Take the good approach (Try 2) 
+
+```
+# go back
+kubectl patch customresourcedefinitions crontabs.stable.example.com --subresource='status' --type='merge' -p '{"status":{"storedVersions":["v1"]}}'
+kubectl replace -f 01-crd.yaml
+# now we can see the again 
+kubectl get crontab 
+```
+
+```
+# get the data
+# eventually you will have this in your version control anyway 
+kubectl get crontab -A -o yaml > all.yaml 
+# this also deletes the corresponding data 
+kubectl delete -f 01-crd.yaml # v1
+kubectl create -f 02-crd.yaml # v2 
+# adjust the version before you apply - we have done this here
+kubectl apply -f 03-crontab.yaml
+```
 
 ## Ref:
 
