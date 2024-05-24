@@ -4,6 +4,9 @@
 
   1. microk8s
      * [Cluster-CIDR ändern](/microk8s/change-cluster-cidr.md)
+    
+  1. Kubernetes Tipps & Tricks
+     * [Hängenden / nicht löschbaren Namespace beenden](kubectl/delete-stuck-namespace.md)
 
   1. Kubernetes - Überblick
      * [Aufbau Allgemein](/kubernetes/architecture.md)
