@@ -1,4 +1,4 @@
-# Using launch configuration for installation (like from 1.28+) 
+# Using launch configuration for installation - cluster/service - cidr (from 1.28+) 
 
 ## Version without adding node 
 
@@ -18,9 +18,10 @@ extraSANs:
   - 172.17.0.1
 addons:
   - name: dns
+  - name: rbac 
 ```
 
-#### Version 1: With persistent cluster token 
+#### Version 2: With persistent cluster token 
 
   * Always use the same token
 
@@ -29,7 +30,8 @@ addons:
 version: 0.2.0
 persistentClusterToken: "a74cddf30d2408d49fcd748a26021c6a"
 join:
-  url: "10.135.0.:25000/a74cddf30d2408d49fcd748a26021c6a"   
+# adjust x to your ip
+  url: "10.135.0.x:25000/a74cddf30d2408d49fcd748a26021c6a"   
 extraCNIEnv:
   IPv4_CLUSTER_CIDR: "172.18.0.0/16"
   IPv4_SERVICE_CIDR: "172.17.0.0/24"
@@ -37,6 +39,7 @@ extraSANs:
   - 172.17.0.1
 addons:
   - name: dns
+  - name: rbac
 ```
 
 
