@@ -51,6 +51,42 @@ addons:
 snap install microk8s --classic 
 ```
 
+### Step 3: Wiederholen für weitere Nodes 
+
+  * Schritt 1+2 wiederholen für alle weiteren Nodes 
+
+
+### Troubleshooten (Variante 1) 
+
+  * In einem Fall hatte ich die falsche IP in /etc/microk8s.yaml eingetragen
+  * Ich habe diese geändert und dann ein:
+  * snap set microk8s config="$(cat /etc/microk8s.yaml)"
+  * Er hat das dann nochmal neu eingelesen und durchgeführt 
+
+### Troubleshooten (Variante 2) 
+
+  * Sollte es wider Erwarten nicht funktionieren:
+
+```
+1. Nochmal die /etc/microk8s.yaml überprüfen
+2. microk8s nochmal komplett deinstallieren:
+snap remove microk8s --purge
+3. Nochmal neu installieren 
+snap install microk8s --classic 
+```
+
+### Überprüfen von service-cidr und pod-cidr auf dem system 
+
+  * Ist alles richtig eingetragen
+  * Konfigurationen werden in microk8s alle unter /var/snap/microk8s/current/args gespeichert
+
+```
+# Das einfachste ist anhand der IP - Range danach zu greppen
+cd /var/snap/microk8s/current/args
+grep -r "172.17." .
+grep -r "172.18." . 
+```
+
 ## Reference: 
 
  *  https://github.com/canonical/microk8s-cluster-agent/blob/main/pkg/k8sinit/testdata/schema/full.yaml
