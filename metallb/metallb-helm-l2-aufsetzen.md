@@ -59,3 +59,61 @@ kubectl apply -f .
 
 ## Schritt 3: Testen.. Bekomme ich eine IP vom LoadBalancer ? 
 
+```
+vi 03-deploy.yml
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  selector:
+    matchLabels:
+      run: web-nginx
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        run: web-nginx
+    spec:
+      containers:
+      - name: cont-nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+
+```
+
+
+```
+vi 04-service.yml
+```
+
+```
+# 02-svc.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-nginx
+  labels:
+    svc: nginx
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    run: web-nginx
+```
+
+
+```
+kubectl apply -f .
+kubectl get pods
+kubectl get svc
+```
+
+```
+kubectl delete -f 03-deploy.yml 04-service.yml 
