@@ -1,6 +1,6 @@
 # Übung http-route mit nginx gateway 
 
-## Schritt 1 Gateway Api Ressources installieren 
+## Schritt 1: Gateway Api Ressources installieren 
 
 ```
 # Standard - Stabile Features 
@@ -11,7 +11,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 # kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/experimental-install.yaml
 ```
 
-## schritt nginx fabric gateway mit helm installieren 
+## Schritt 2: nginx fabric gateway mit helm installieren 
 
 ```
 helm install ngf oci://ghcr.io/nginxinc/charts/nginx-gateway-fabric --create-namespace -n nginx-gateway
