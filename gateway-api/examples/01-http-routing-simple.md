@@ -50,7 +50,7 @@ vi 02-httproute.yml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: foo
+  name: apple-http-route
 spec:
   parentRefs:
   - name: prod-web
@@ -65,9 +65,50 @@ spec:
 kubectl apply -f .
 ```
 
+## Schritt 3: Service und Pod / Deployment definieren 
 
+```
+vi 03-apple-pod.yml
+```
 
+```
+# apple.yml 
+# vi apple.yml 
+kind: Pod
+apiVersion: v1
+metadata:
+  name: apple-app
+  labels:
+    app: apple
+spec:
+  containers:
+    - name: apple-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=apple"
+```
 
+```
+vi 04-service.yml
+```
+
+```
+kind: Service
+apiVersion: v1
+metadata:
+  name: apple-service
+spec:
+  selector:
+    app: apple
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5678 # Default port for image
+```
+
+```
+kubectl apply -f .
+```
 
 ## Reference:
 
