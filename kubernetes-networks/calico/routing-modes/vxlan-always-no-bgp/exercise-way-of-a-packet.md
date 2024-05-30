@@ -13,6 +13,10 @@
 ## Schritt 1: Vorbereitung ( 2 Pods auf unterschiedlichen nodes starten )
 
 ```
+kubectl get nodes
+```
+
+```
 # Achtung: Nodes anpassen
 NODE1=worker1
 NODE2=worker2
