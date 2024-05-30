@@ -63,26 +63,87 @@ kubectl get po httpbin -o wide
 
 ```
 # Beispielausgabe
-10.244.1.246
+172.18.104.14
 ```
 
 ## Schritt 3: Ziel-Pod (httpbin auf NODE2) von curl auf NODE1 aus aufrufen
 
 ```
 # Verbindung funktioniert 
-kubectl exec -it curl -- curl http://10.244.1.246:80/
+kubectl exec -it curl -- curl http://172.18.104.14:80/
 ```
 
-## Schritt 3.1: CURL Debuggen 1: Lass uns die Route zu 10.244.1.246 herausfinden (von curl aus) 
+## Schritt 3.1: CURL Debuggen 1: Lass uns die Route zu 172.18.104.14 herausfinden (von curl aus) 
 
 ```
-kubectl exec curl -- ip route get 10.244.1.246
+kubectl exec curl -- ip route get 172.18.104.14
 ```
 
 ```
 # Beispielausgabe
-10.244.1.246 via 10.244.0.237 dev eth0  src 10.244.0.153
+172.18.104.14 via 169.254.1.1 dev eth0  src 172.18.166.139
 ```
+
+```
+## ERKLÄRUNG 
+# <- 169.254.1.1 ist hier eine spezielle Adresse die proxy_arp verwenden
+# Alle IP-Adressanfragen, die ausserhalb des Netzes sind, werden
+# an den proxy_arp proxy geschickt
+# Das sind im System alle Elemente der calico-veth-Paare, die auf dem Hostsystem sind:
+```
+
+```
+# So finden wir diese raus:
+kubectl debug node/node1 -it --image=busybox
+```
+
+```
+for i in  /host/proc/sys/net/ipv4/conf/cali*; do echo $i; cat $i/proxy_arp; done
+```
+
+```
+/host/proc/sys/net/ipv4/conf/cali03d459aac7e
+1
+/host/proc/sys/net/ipv4/conf/cali35e3a5cb80b
+1
+/host/proc/sys/net/ipv4/conf/cali62facc760af
+1
+```
+
+## Schritt 3.2 Aber welches Paar ist es nun ? 
+
+```
+# Im Container:
+kubectl exec -it curl -- ip a eth0
+```
+
+```
+# Die Ausgabe:
+3: eth0@if19: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1450 qdisc noqueue state UP
+    inet 172.18.166.139/32 scope global eth0
+```
+
+```
+# Das Equivalent findet sich auf dem Server
+kubectl debug -it node/node1 --image=busybox
+```
+
+```
+ip a | grep ^19
+```
+
+```
+# Ausgabe 
+19: cali35e3a5cb80b@eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue
+```
+
+```
+# Yeah, das ist unser veth - paar
+```
+
+
+
+
 
 ## Schritt 3.2. CURL: Debuggen 2: Wie ist die Mac-Adresse von 10.244.0.237 
 
