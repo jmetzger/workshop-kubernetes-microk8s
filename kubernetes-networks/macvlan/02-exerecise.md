@@ -42,7 +42,7 @@ kubectl apply -f .
 
 ```
 vi 02-netpod1.yml 
-# on node2 
+# on node1 
 ```
 
 ```
@@ -64,14 +64,36 @@ spec:
 
 ```
 vi 03-netpod2.yml
-# on node3
+# on node1
 ```
 
 ```
 apiVersion: v1
 kind: Pod
 metadata:
-  name: net-pod
+  name: net-pod2
+  annotations:
+    k8s.v1.cni.cncf.io/networks: ipvlan-def
+spec:
+  nodeName: node1
+  containers:
+  - name: netshoot-pod
+    image: nicolaka/netshoot
+    command: ["tail"]
+    args: ["-f", "/dev/null"]
+  terminationGracePeriodSeconds: 0
+```
+
+```
+vi 04-netpod3.yml
+# on node2
+```
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: net-pod3
   annotations:
     k8s.v1.cni.cncf.io/networks: ipvlan-def
 spec:
@@ -87,6 +109,12 @@ spec:
 ```
 kubectl apply -f .
 ```
+
+## Pingeable ?
+
+ * Exercise: Test ping from netpod -> netpod2 (same host) -> works
+ * Exercise: Test ping from netpod2 (node1) -> netpod3 (node2) -> does not work 
+   * Interface would need promiscous mode, only possible directly to be set on host, not on WM (IMHO)
 
 ## Reference 
 
