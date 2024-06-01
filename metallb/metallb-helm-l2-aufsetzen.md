@@ -1,4 +1,4 @@
-# Metallb mit helm für L2 aufsetzen 
+# Metallb mit helm für L2 aufsetzen (DigitalOcean) 
 
 ## Schritt 1: helm chart installieren 
 
