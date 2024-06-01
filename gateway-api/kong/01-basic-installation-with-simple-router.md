@@ -66,7 +66,92 @@ spec:
         from: Same
 ```
 
+### Step 5: Setup httproute for gateway
 
+```
+vi 03-http-route.yml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: apple-http-route
+spec:
+  parentRefs:
+  - name: prod-web-kong
+  rules:
+  - backendRefs:
+    - name: apple-service-kong
+      port: 80
+```
+
+```
+kubectl apply -f .
+```
+
+### Step 6: Setup apple-pod and apple-service 
+
+```
+vi apple-pod.yml 
+```
+
+```
+# apple.yml
+# vi apple.yml
+kind: Pod
+apiVersion: v1
+metadata:
+  name: apple-app-kong
+  labels:
+    app: apple-kong
+spec:
+  containers:
+    - name: apple-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=apple"
+```
+
+```
+kubectl apply -f .
+```
+
+```
+vi 05-apple-service.yml
+```
+
+```
+# apple.yml
+kind: Service
+apiVersion: v1
+metadata:
+  name: apple-service-kong
+spec:
+  selector:
+    app: apple-kong
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5678 # Default port for image
+```
+
+
+```
+kubectl apply -f .
+```
+
+### Step 7: Test it 
+
+```
+# Find out the public ip
+kubectl -n kong get svc kong-gateway
+```
+
+```
+# In your browser open
+# this ip from above
+```
 
 ### Reference / Get Started 
 
