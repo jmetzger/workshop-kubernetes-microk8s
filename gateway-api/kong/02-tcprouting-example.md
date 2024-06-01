@@ -105,22 +105,105 @@ vi 03-gateway.yml
 ```
 
 ```
-
-
-
-
-
-## Step 5: Setup tcprouting 
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: prod-stream-9000
+spec:
+  gatewayClassName: kong
+  listeners:
+  - protocol: TCP
+    port: 9000
+    name: stream9000
+```
 
 ```
-vi 03-tcprouting.yaml
+kubectl apply -f .
+kubectl get gateway prod-stream-9000
+```
+
+## Step 7: Setup tcprouting 
+
+```
+vi 04-tcprouting.yaml
 ```
 
 ```
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: echo-plaintext
+spec:
+  parentRefs:
+  - name: prod-stream-9000
+    sectionName: stream9000
+  rules:
+  - backendRefs:
+    - name: echo
+      port: 1025
+```
 
+```
+kubectl apply -f .
+```
 
+## Step 8: Verify 
 
+### Verification 1:
+
+```
+# Is there a status ?
+kubectl describe tcproute echo-plaintext
+
+# If there is not status.....
+# -> Objekt is in etcd -> BUT: it is not processed by Kong
+```
+
+## Step 9: Fix 
+
+```
+# We are using an alpha - feature, and need to enable these alpha - features in Kong
+https://docs.konghq.com/kubernetes-ingress-controller/latest/reference/feature-gates/
+```
+
+```
+# Version 1: Just for testing
+kubectl set env -n kong deployment/kong-kong CONTROLLER_FEATURE_GATES="GatewayAlpha=true" -c ingress-controller
+```
+
+```
+# Version 2: Set it correctly in your kong-values.yaml file and upgrade
+## add 
+ingressController:
+  env:
+    feature_gates: FillIDs=true,RewriteURIs=true
+```
+
+```
+## i have not tested this yet
+helm -n kong upgrade kong kong/kong -f kong-values.yaml 
+```
+
+## Step 10: Retest 
+
+```
+kubectl -n kong describe tcproute echo-plaintext
+kubectl get tcproute echo-plaintext -ojsonpath='{.status.parents[0].conditions[?(@.reason=="Accepted")]}'
+```
+
+## Step 11: Test connection 
+
+```
+# You should get the public ip from here 
+kubectl -n kong get svc 
+# on your local machine our linux-client
+telnet <public-ip-of-kong-proxy> 9000 
+
+# now you can write something and
+# and it will get returned back 
+```
 
 ## Reference 
 
-  * Example from envoy as reference: 
+  * https://docs.konghq.com/kubernetes-ingress-controller/3.1.x/guides/services/tcp/
+  * https://gateway-api.sigs.k8s.io/guides/tcp/
