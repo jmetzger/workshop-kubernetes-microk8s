@@ -52,6 +52,74 @@ kubectl -n kong get svc kong-kong-gateway
 kubectl -n kong describe deploy kong-kong | grep KONG_STREAM_LISTEN
 ```
 
+## Step 3: Setup gatewayclass 
+
+```
+vi 01-gatewayclass.yml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: kong
+  annotations:
+    konghq.com/gatewayclass-unmanaged: 'true'
+
+spec:
+  controllerName: konghq.com/kic-gateway-controller
+```
+
+## Step 4: Beispiel echo-service 
+
+```
+wget -O 02-echo-service.yaml https://docs.konghq.com/assets/kubernetes-ingress-controller/examples/echo-service.yaml
+cat 02-echo-service.yaml
+kubectl apply -f 02-echo-service.yaml 
+```
+
+## Step 5: Test it locally 
+se
+```
+kubectl get svc echo
+# show the ports e.g. 1025
+kubectl run -it --rm podtester --image=busybox
+```
+
+```
+telnet echo 1025
+# you can write something and will get it back
+hello you, Jochen
+hello you, Jochen
+```
+
+```
+CRTL + C
+e
+```
+
+## Step 6: Setup gateway 
+
+```
+vi 03-gateway.yml
+```
+
+```
+
+
+
+
+
+## Step 5: Setup tcprouting 
+
+```
+vi 03-tcprouting.yaml
+```
+
+```
+
+
+
 
 ## Reference 
 
