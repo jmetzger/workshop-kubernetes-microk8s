@@ -156,3 +156,4 @@ kubectl -n kong get svc kong-gateway
 ### Reference / Get Started 
 
   * https://github.com/kong/kubernetes-ingress-controller
+  * https://gateway-api.sigs.k8s.io/guides/simple-gateway/
