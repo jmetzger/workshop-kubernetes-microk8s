@@ -8,18 +8,49 @@
 kubectl -n kong get svc kong-gateway-proxy
 ```
 
-## Needed changes 
+## Step 1: Setup experimental crds 
+ 
 
-### Ministep 1: We need to use the experimental features 
+```
+cd
+mkdir -p manifests
+cd manifests
+mkdir -p kong-gateway-tcp
+cd kong-gateway-tcp
+mkdir api
+cd api
+```
+
+```
+wget -O gateway-api-1.1.0-experimental.yml https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
+kubectl apply -f .
+```
+
+### Step 2: setup kong 
 
 
-### Ministep 2: we need to enable experimental features for kong 
+```
+vi kong-values.yml
+```
 
+```
+proxy:
+  stream:
+    - containerPort: 9000
+      servicePort: 9000
+      protocol: TCP
+```
 
+```
+helm repo add kong https://charts.konghq.com
+helm install kong kong/kong -f kong-values.yml --namespace kong --create-namespace
+```
 
-
-
-## Step 1: Setti
+```
+# Verify that listen is setup
+kubectl -n kong get svc kong-kong-gateway
+kubectl -n kong describe deploy kong-kong | grep KONG_STREAM_LISTEN
+```
 
 
 ## Reference 
