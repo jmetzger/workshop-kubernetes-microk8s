@@ -7,7 +7,7 @@
      * [Cluster-CIDR und Service-CIDR bei Installation](/microk8s/launch-configuration/set-cluster-cidr-4-installation.md)
 
   1. metallb / services / ingress
-      * [Ingress vs. Service](![image](service-vs-ingress.md)
+      * [Ingress vs. Service](service-vs-ingress.md)
     
   1. Kubernetes Tipps & Tricks
      * [Hängenden / nicht löschbaren Namespace beenden](kubectl/delete-stuck-namespace.md)
