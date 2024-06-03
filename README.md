@@ -12,6 +12,7 @@
     
   1. Kubernetes Tipps & Tricks
      * [Hängenden / nicht löschbaren Namespace beenden](kubectl/delete-stuck-namespace.md)
+     * [Image-Version eines Pod/Deployments rausfinden z.B. metallb](find-version-image.md)
     
   1. Networking -> Calico
      * [Welcher Routing-Mode wird verwendet](kubernetes-networks/calico/which-routing-mode-is-used.md)
