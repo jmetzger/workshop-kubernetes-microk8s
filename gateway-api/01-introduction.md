@@ -7,9 +7,11 @@
 ## Komponenten 
 
   1. GatewayController (Kong, Nginx, Traefik, HAProxy, Istio) - Software
-  1. GatewayClass
-  1. Gateway 
+  1. GatewayClass (Stable)
+  1. Gateway (Stable) 
   1. HttpRoute (GA) / TCPRoute (experimentell) / gRPCRoute (experimentell) 
+
+
 
 
 4. Different types of routing:
