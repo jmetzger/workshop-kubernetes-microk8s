@@ -34,7 +34,7 @@ spec:
   # we will use our external ip here 
   - 134.209.231.154-134.209.231.154
   # both notations are possible 
-  - 157.230.113.124/24
+  - 157.230.113.124/32
 ```
 
 ```
