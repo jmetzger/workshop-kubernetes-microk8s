@@ -4,7 +4,7 @@
 
 ```
 helm repo add metallb https://metallb.github.io/metallb
-helm install metallb metallb/metallb --namespace=metallb-system --create-namespace
+helm install metallb metallb/metallb --version 0.14.5 --namespace=metallb-system --create-namespace
 ```
 
 ```
