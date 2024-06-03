@@ -4,26 +4,9 @@
 
 ### Step 1: Setup /etc/microk8s.yaml on node 
 
-#### Version 1: Without joining (from microk8s 1.28+)
+#### With persistent cluster token 
 
-  * Nice, because it sets all the right places 
-
-```
----
-version: 0.2.0
-extraCNIEnv:
-  IPv4_CLUSTER_CIDR: "172.18.0.0/16"
-  IPv4_SERVICE_CIDR: "172.17.0.0/24"
-extraSANs:
-  - 172.17.0.1
-addons:
-  - name: dns
-  - name: rbac 
-```
-
-#### Version 2: With persistent cluster token 
-
-  * Always use the same token
+  * Makes it possible to always use the same token
 
 ```
 ---
