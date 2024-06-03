@@ -1,10 +1,8 @@
 # Using launch configuration for installation - cluster/service - cidr (from 1.28+) 
+ 
+## Step 1: Setup /etc/microk8s.yaml on node 
 
-## Version without adding node 
-
-### Step 1: Setup /etc/microk8s.yaml on node 
-
-#### With persistent cluster token 
+### With persistent cluster token 
 
   * Makes it possible to always use the same token
 
@@ -26,7 +24,7 @@ addons:
 ```
 
 
-### Step 2: Installieren von microk8s 
+## Step 2: Installieren von microk8s 
 
   * Wenn einer fehler in der config ist, installiert er nicht ! (Das ist gut)
 
