@@ -3,6 +3,9 @@
 ## Features 
 
   * Responsibility separation
+  * TrafficRouting based on RequestHeader / Environment Variable 
+  * LoadBalancing (Gewichtung: 10% an Service 1, 90% an Service 2) 
+  * TCP und gRPC-Routing 
 
 ## Komponenten 
 
@@ -10,21 +13,6 @@
   1. GatewayClass (Stable)
   1. Gateway (Stable) 
   1. HttpRoute (GA) / TCPRoute (experimentell) / gRPCRoute (experimentell) 
-
-
-
-
-4. Different types of routing:
-httproute
-tcproute
-grpcroute
-
-5. TrafficRouting based on Request Header
-
-6. Load Balancing
-
-
-
 
 ## Shared responsibility 
 
