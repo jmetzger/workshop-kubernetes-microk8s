@@ -8,6 +8,7 @@
 
   1. metallb / services / ingress
       * [Ingress vs. Service](ingress-vs-service.md)
+      * [Install Ingress without Service LoadBalancer](ingress/nginx-without-loadbalancer-service.md)
     
   1. Kubernetes Tipps & Tricks
      * [Hängenden / nicht löschbaren Namespace beenden](kubectl/delete-stuck-namespace.md)
