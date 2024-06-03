@@ -9,7 +9,7 @@
      * [Hängenden / nicht löschbaren Namespace beenden](kubectl/delete-stuck-namespace.md)
     
   1. Networking -> Calico
-    * [Welcher Routing-Mode wird verwendet](kubernetes-networks/calico/which-routing-mode-is-used.md)
+     * [Welcher Routing-Mode wird verwendet](kubernetes-networks/calico/which-routing-mode-is-used.md)
 
   1. Kubernetes - Überblick
      * [Aufbau Allgemein](/kubernetes/architecture.md)
