@@ -47,7 +47,7 @@ helm install kong kong/kong -f kong-values.yml --namespace kong --create-namespa
 
 ```
 # Verify that listen is setup
-kubectl -n kong get svc kong-kong-gateway
+kubectl -n kong get svc kong-kong-proxy
 kubectl -n kong describe deploy kong-kong | grep KONG_STREAM_LISTEN
 ```
 
