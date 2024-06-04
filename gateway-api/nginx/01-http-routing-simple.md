@@ -4,7 +4,24 @@
   * Gateway API CRD's & Nginx Fabric Gateway müssen installiert sein
   * siehe [Installation nginx](/gateway-api/installation/nginx.md)
 
-## Schritt 1: Gateway aufsetzen (Beispiel mit nginx) 
+## Schritt 1: Gateway Api Ressources installieren 
+
+```
+# Standard - Stabile Features 
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/standard-install.yaml
+
+# Es gibt auch einen experimentellen Channel, der aber anders installiert werden muss
+# MACHEN WIR NICHT 
+# kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/experimental-install.yaml
+```
+
+## Schritt 2: nginx fabric gateway mit helm installieren 
+
+```
+helm install ngf oci://ghcr.io/nginxinc/charts/nginx-gateway-fabric --create-namespace -n nginx-gateway
+```
+
+## Schritt 3: Gateway aufsetzen (Beispiel mit nginx) 
 
   * An dieses Gateway kann ich nur Routen im gleichen Namespace anhängen
 
@@ -40,7 +57,7 @@ spec:
 kubectl apply -f .
 ```
 
-## Schritt 2: HTTP-Route definieren 
+## Schritt 4: HTTP-Route definieren 
 
 ```
 vi 02-httproute.yml
@@ -65,7 +82,7 @@ spec:
 kubectl apply -f .
 ```
 
-## Schritt 3: Service und Pod / Deployment definieren 
+## Schritt 4: Service und Pod / Deployment definieren 
 
 ```
 vi 03-apple-pod.yml
@@ -110,7 +127,10 @@ spec:
 kubectl apply -f .
 ```
 
-## Reference:
+## Reference: 
+
+  * https://github.com/nginxinc/nginx-gateway-fabric
+  * https://docs.nginx.com/nginx-gateway-fabric/installation/expose-nginx-gateway-fabric/
 
   * https://gateway-api.sigs.k8s.io/guides/simple-gateway/
 
