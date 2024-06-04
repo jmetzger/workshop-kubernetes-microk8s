@@ -107,6 +107,68 @@ kubectl describe certificates let-cert
 kubectl get secret tls-secret -o yaml 
 ```
 
+## Step 7: Setup gateway with https 
+
+```
+vi 04-gateway.yml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: prod-https-kong
+spec:
+  gatewayClassName: kong
+  listeners:
+  - protocol: HTTPS
+    port: 443
+    name: prod-https-gw
+    hostname: "jochen.app1.do.t3isp.de"
+    tls:
+      certificateRefs:
+      - kind: Secret
+        name: tls-secret
+    allowedRoutes:
+      namespaces:
+        from: Same
+```
+
+```
+kubectl apply -f .
+```
+
+```
+vi 05-http-routes.yml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+ name: apple-https-route
+spec:
+  parentRefs:
+  - name: prod-https-kong
+  hostnames:
+  - jochen.app1.do.t3isp.de
+  rules:
+  - backendRefs:
+    - name: apple-service-kong
+      port: 80
+```
+
+```
+kubectl apply -f .
+```
+
+### Step 8: Test in browser
+
+```
+https://jochen.app1.t3isp.de
+```
+
+
 ## Reference 
   * https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-with-cert-manager-on-digitalocean-kubernetes
   * Problem fix: https://www.digitalocean.com/community/questions/how-do-i-correct-a-connection-timed-out-error-during-http-01-challenge-propagation-with-cert-manager
