@@ -4,9 +4,9 @@
 
 ```
 cd
-mkdir manifests
+mkdir -p manifests
 cd manifests
-mkdir kong-gateway
+mkdir -p kong-gateway
 cd kong-gateway
 ```
 
