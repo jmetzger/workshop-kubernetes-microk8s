@@ -180,7 +180,7 @@ ingressController:
 
 ```
 ## i have not tested this yet
-helm -n kong upgrade kong kong/kong -f kong-values.yaml 
+helm -n kong upgrade kong kong/kong -f kong-values.yml 
 ```
 
 ## Step 10: Retest 
