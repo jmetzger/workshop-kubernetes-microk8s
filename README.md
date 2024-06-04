@@ -18,6 +18,9 @@
      * [Example httproute Kong](gateway-api/kong/01-basic-installation-with-simple-router.md)
      * [Example httproute Kong](gateway-api/kong/02-tcprouting-example.md)
     
+  1. Kubernetes Storage
+     * [Storage mit CSI anbinden](kubernetes-csi/nfs-exercise.md)
+    
   1. Kubernetes Tipps & Tricks
      * [Hängenden / nicht löschbaren Namespace beenden](kubectl/delete-stuck-namespace.md)
      * [Image-Version eines Pod/Deployments rausfinden z.B. metallb](find-version-image.md)
