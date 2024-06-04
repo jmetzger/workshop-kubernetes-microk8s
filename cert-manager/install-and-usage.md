@@ -56,13 +56,13 @@ kubectl -n cert-manager apply -f .
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: example-issuer
+  name: letsencrypt-prod-issuer
 spec:
   acme:
     email: some@domain.de
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
-      name: letsencrypt-prod 
+      name: letsencrypt-prod
     solvers:
     - selector:
         dnsZones:
@@ -71,16 +71,41 @@ spec:
         digitalocean:
           tokenSecretRef:
             name: digitalocean-dns
-            key: access-token
-
+            key: access-tokenapiVersion: cert-manager.io/v1
 ```
 
 ```
 kubectl apply -f .
 ```
 
+## Step 5: manifests for certificate (wildcard) 
 
+```
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: le-crt
+spec:
+  secretName: tls-secret
+  issuerRef:
+    kind: Issuer
+    name: letsencrypt-prod-issuer
+  commonName: "*.app1.do.t3isp.de"
+  dnsNames:
+    - "*.app1.do.t3isp.de"
+```
 
+```
+kubectl apply -f .
+```
+
+## Step 6: check if certificate was created 
+
+```
+kubectl get certificates
+kubectl describe certificates let-cert 
+kubectl get secret tls-secret -o yaml 
+```
 
 ## Reference 
   * https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-with-cert-manager-on-digitalocean-kubernetes
