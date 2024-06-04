@@ -172,10 +172,10 @@ kubectl set env -n kong deployment/kong-kong CONTROLLER_FEATURE_GATES="GatewayAl
 
 ```
 # Version 2: Set it correctly in your kong-values.yaml file and upgrade
-## add 
+## add the following lines
 ingressController:
   env:
-    feature_gates: FillIDs=true,RewriteURIs=true
+    feature_gates: GatewayAlpha=true
 ```
 
 ```
