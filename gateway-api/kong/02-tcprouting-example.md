@@ -78,7 +78,7 @@ kubectl apply -f 02-echo-service.yaml
 ```
 
 ## Step 5: Test it locally 
-se
+
 ```
 kubectl get svc echo
 # show the ports e.g. 1025
