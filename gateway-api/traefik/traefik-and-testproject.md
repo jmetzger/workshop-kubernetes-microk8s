@@ -71,6 +71,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: whoami
+spec:
+  selector:
+    app: whoami
+
+  ports:
+    - port: 80
+      targetPort: http
 
 ```
 
