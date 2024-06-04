@@ -1,12 +1,11 @@
 # Example tcp routing 
 
 ## Prerequisites: 
-
-  * kong is installed and a service runs for kong-gateway runs in kong - namespace
-
-```
-kubectl -n kong get svc kong-gateway-proxy
-```
+ 
+  * Remove helm chart for ingress if present : helm -n kong uninstall kong (if ingress was installed as kong) 
+  * kong - chart is installed
+    * https://artifacthub.io/packages/helm/kong/kong
+    * and a service runs for kong-gateway runs in kong - namespace
 
 ## Step 1: Setup experimental crds 
  
