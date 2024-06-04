@@ -127,6 +127,24 @@ spec:
 kubectl apply -f .
 ```
 
+## Use specific IP for metallb 
+
+```
+vi values.yaml 
+```
+
+```
+service:
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: 164.92.141.176
+```
+
+```
+helm upgrade ngf oci://ghcr.io/nginxinc/charts/nginx-gateway-fabric -n nginx-gateway -f values.yaml
+kubectl -n nginx-gateway get svc 
+```
+
+
 ## Reference: 
 
   * https://github.com/nginxinc/nginx-gateway-fabric
