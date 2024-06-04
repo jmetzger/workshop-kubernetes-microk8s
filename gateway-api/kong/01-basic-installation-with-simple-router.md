@@ -18,7 +18,10 @@ kubectl apply -f 00-gateway-api-standard-1.1.0.yml
 ## Step 2: Install kong with helm 
 
 ```
-helm install kong --namespace kong --create-namespace --repo https://charts.konghq.com ingress
+helm repo add kong https://charts.konghq.com
+helm install kong kong/kong -f kong-values.yml --namespace kong --create-namespace
+# Verify that listen is setup
+kubectl -n kong get svc kong-kong-proxy
 ```
 
 
