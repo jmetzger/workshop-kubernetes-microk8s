@@ -47,7 +47,7 @@ data:
 ```
 
 ```
-kubectl apply -f .
+kubectl -n cert-manager apply -f .
 ```
 
 ## Step 4: Create an issuer 
@@ -59,9 +59,15 @@ metadata:
   name: example-issuer
 spec:
   acme:
-    ...
+    email: some@domain.de
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-prod 
     solvers:
-    - dns01:
+    - selector:
+        dnsZones:
+          - "do.t3isp.de"
+      dns01:
         digitalocean:
           tokenSecretRef:
             name: digitalocean-dns
