@@ -104,6 +104,14 @@ kubectl config set-context --current --namespace <dein-namespace>
 ```
 
 
+## Was darf ich alles ?
+
+```
+kubectl auth can-i --list
+kubectl auth can-i get nodes
+```
+
+
 
 ## Referenz
 
