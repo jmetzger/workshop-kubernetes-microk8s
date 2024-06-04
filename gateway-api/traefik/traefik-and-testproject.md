@@ -25,8 +25,8 @@
 ```
 
 ```
-helm 
-helm install traefik --set experimental.kubernetesGateway.enabled=true traefik/traefik
+helm repo add traefik https://traefik.github.io/charts
+helm install traefik --set experimental.kubernetesGateway.enabled=true traefik/traefik --version 28.2.0
 # This installs the gatewayclass and the gateway
 ```
 
