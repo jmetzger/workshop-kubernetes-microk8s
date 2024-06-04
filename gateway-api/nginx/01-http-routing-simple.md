@@ -43,7 +43,7 @@ kind: Gateway
 metadata:
   name: prod-web
 spec:
-  gatewayClassName: example
+  gatewayClassName: nginx
   listeners:
   - protocol: HTTP
     port: 80
