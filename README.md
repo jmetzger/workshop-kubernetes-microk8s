@@ -17,6 +17,7 @@
      * [Example httproute Traefik](gateway-api/traefik/traefik-and-testproject.md)
      * [Example httproute Kong](gateway-api/kong/01-basic-installation-with-simple-router.md)
      * [Example tcproute Kong](gateway-api/kong/02-tcprouting-example.md)
+     * [Example tcproute with Cert Manager and Kong](cert-manager/install-and-usage-example-with-kong.md)
     
   1. Kubernetes Storage
      * [Storage mit CSI anbinden](kubernetes-csi/nfs-exercise.md)
