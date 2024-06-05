@@ -60,7 +60,7 @@ kubectl -n cert-manager apply -f .
 
 ```
 apiVersion: cert-manager.io/v1
-kind: Issuer
+kind: ClusterIssuer
 metadata:
   name: letsencrypt-prod-issuer
 spec:
@@ -77,7 +77,7 @@ spec:
         digitalocean:
           tokenSecretRef:
             name: digitalocean-dns
-            key: access-tokenapiVersion: cert-manager.io/v1
+            key: access-token
 ```
 
 ```
@@ -94,7 +94,7 @@ metadata:
 spec:
   secretName: tls-secret
   issuerRef:
-    kind: Issuer
+    kind: ClusterIssuer
     name: letsencrypt-prod-issuer
   commonName: "*.app1.do.t3isp.de"
   dnsNames:
