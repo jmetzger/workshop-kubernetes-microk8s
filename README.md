@@ -27,6 +27,9 @@
      * [Hängenden / nicht löschbaren Namespace beenden](kubectl/delete-stuck-namespace.md)
      * [Image-Version eines Pod/Deployments rausfinden z.B. metallb](find-version-image.md)
      * [Manifests mit dry-run ausgeben/erstellen](/tipps-tricks/create-manifest-with-dry-run.md)
+    
+  1. Kubernetes Networkin Tipps & Tricks
+     * [Debug Pod für Pod starten](/kubernetes-networks/debug-container.md)
 
   1. Kubernetes CRD's
      * [Kubernetes CRD's](kubernetes-crds/exercise.md)
