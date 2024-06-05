@@ -174,3 +174,4 @@ https://jochen.app1.t3isp.de
   * Problem fix: https://www.digitalocean.com/community/questions/how-do-i-correct-a-connection-timed-out-error-during-http-01-challenge-propagation-with-cert-manager
   * Question: Do we have the same problem wiht metallb
   * https://cert-manager.io/docs/configuration/acme/dns01/digitalocean/
+  * https://artifacthub.io/packages/helm/cert-manager/cert-manager
