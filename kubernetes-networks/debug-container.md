@@ -3,9 +3,11 @@
 ##  Walkthrough  Debug Container 
 
 ```
+# Show that is does not work 
 kubectl run ephemeral-demo --image=registry.k8s.io/pause:3.1 --restart=Never
 kubectl exec -it ephemeral-demo -- sh
 
+# Start a debug container 
 kubectl debug -it ephemeral-demo --image=busybox 
 ```
 
