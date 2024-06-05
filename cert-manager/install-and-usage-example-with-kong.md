@@ -22,6 +22,12 @@ https://cloud.digitalocean.com/account/api/tokens/new
 echo -n 'your-access-token' | base64
 ```
 
+## Step 2.5: Subdomains einrichten in digitalocean - dns 
+
+```
+TBD 
+```
+
 ## Step 3: Create secret based on that 
 
 ```
