@@ -1,5 +1,17 @@
 # Which routing mode is used 
 
+## Variante: calico in microk8s (z.B.) 
+
+```
+kubectl -n kube-system describe ds calico-node | grep -A 35  calico-node
+# or specific
+kubectl -n kube-system describe ds calico-node | egrep -i -e vxlan  -e cluster_type
+
+```
+
+
+## Variante: vanilla calico (z.B.) 
+
 ```
 kubectl -n calico-system describe ds calico-node | grep -A 35  calico-node
 # or specific
