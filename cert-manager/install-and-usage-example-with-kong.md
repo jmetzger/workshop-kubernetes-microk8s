@@ -59,6 +59,10 @@ kubectl -n cert-manager apply -f .
 ## Step 4: Create an clusterissuer (works across all namespaces) 
 
 ```
+vi 02-clusterissuer.yml
+```
+
+```
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
