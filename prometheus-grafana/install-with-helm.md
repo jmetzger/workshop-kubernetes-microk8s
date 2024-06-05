@@ -49,10 +49,9 @@ ace monitoring --create-namespace --version 59.1.0
 helm -n monitoring get notes prometheus
 
 # Get pod that runs prometheus 
-export POD_NAME=$(kubectl get pods --namespace monitoring -l "app.kubernetes.io/name=prometheus,app.kubernetes.io/instance=prometheus" -o jsonpath="{.items[0].metadata.name}")
+kubectl -n monitoring get service 
+kubectl -n monitoring port-forward svc/prometheus-prometheus 9090 &
 
-# Do the port forwarding 
-kubectl -n monitoring port-forward $POD_NAME 9090 &
 ```
 
 ### Step 3.2: Start a tunnel in (from) your local-system to the server 
@@ -68,22 +67,22 @@ ssh -L 9090:localhost:9090 tln1@164.92.129.7
 http://localhost:9090 
 ```
 
-## Step 4: Connect to the alert manager from the outside world 
+## Step 4: Connect to the grafana from the outside world 
 
-### Step 4.1: Start proxy to connect (to on Linux Client)
+### Step 4.1: Start proxy to connect 
 
 ```
-# this is shown in the helm information 
-helm -n monitoring get notes prometheus
-
-# Get pod that runs prometheus 
-export POD_NAME=$(kubectl get pods --namespace monitoring -l "app.kubernetes.io/name=prometheus,app.kubernetes.io/instance=prometheus" -o jsonpath="{.items[0].metadata.name}")
-
 # Do the port forwarding 
-kubectl -n monitoring port-forward $POD_NAME 9090 &
-```
+# Adjust your pods here
+kubectl -n monitoring get pods | grep grafana 
+kubectl -n monitoring port-forward grafana-56b45d8bd9-bp899 3000 &
 ```
 
+### Step 4.2: Start a tunnel in (from) your local-system to the server 
+
+```
+ssh -L 3000:localhost:3000 tln1@164.92.129.7
+```
 
 
 
