@@ -16,7 +16,7 @@
      * [Example httproute Nginx](gateway-api/nginx/01-http-routing-simple.md)
      * [Example httproute Traefik](gateway-api/traefik/traefik-and-testproject.md)
      * [Example httproute Kong](gateway-api/kong/01-basic-installation-with-simple-router.md)
-     * [Example httproute Kong](gateway-api/kong/02-tcprouting-example.md)
+     * [Example tcproute Kong](gateway-api/kong/02-tcprouting-example.md)
     
   1. Kubernetes Storage
      * [Storage mit CSI anbinden](kubernetes-csi/nfs-exercise.md)
