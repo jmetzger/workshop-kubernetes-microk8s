@@ -56,7 +56,7 @@ data:
 kubectl -n cert-manager apply -f .
 ```
 
-## Step 4: Create an issuer 
+## Step 4: Create an clusterissuer (works across all namespaces) 
 
 ```
 apiVersion: cert-manager.io/v1
