@@ -1,5 +1,6 @@
 # Example only allow traffic within Namespace and Egress 
 
+```
 ---
 apiVersion: crd.projectcalico.org/v1
 kind: GlobalNetworkPolicy
