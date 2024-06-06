@@ -42,6 +42,10 @@
      * [Welcher Routing-Mode wird verwendet](kubernetes-networks/calico/which-routing-mode-is-used.md)
      * [Cluster und Pod-Cidr anzeigen](kubernetes-networks/calico/show-cluster-and-pod-cidr.md)
 
+  1. NetworkPolicies -> Calica
+     * [Calico only within Namespace](/kubernetes-networkpolicy/calico/example-only-traffic-ingress-egress-in-namespace/example.md)
+     * [Calico only within Namespace](/kubernetes-networkpolicy/calico/example-only-traffic-ingress-restricted-in-namespace/example.md)
+
   1. FAQs
      * [Diverse FAQs](faq.md)
 
