@@ -28,7 +28,7 @@
      * [Image-Version eines Pod/Deployments rausfinden z.B. metallb](find-version-image.md)
      * [Manifests mit dry-run ausgeben/erstellen](/tipps-tricks/create-manifest-with-dry-run.md)
     
-  1. Kubernetes Networkin Tipps & Tricks
+  1. Kubernetes Networking Tipps & Tricks
      * [Debug Pod für Pod starten](/kubernetes-networks/debug-container.md)
 
   1. Kubernetes CRD's
@@ -36,6 +36,11 @@
     
   1. Networking -> Calico
      * [Welcher Routing-Mode wird verwendet](kubernetes-networks/calico/which-routing-mode-is-used.md)
+
+  1. FAQs
+     * [Diverse FAQs](faq.md)
+
+## Backlog 
 
   1. Kubernetes - Überblick
      * [Aufbau Allgemein](/kubernetes/architecture.md)
