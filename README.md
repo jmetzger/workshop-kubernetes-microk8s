@@ -36,6 +36,7 @@
     
   1. Networking -> Calico
      * [Welcher Routing-Mode wird verwendet](kubernetes-networks/calico/which-routing-mode-is-used.md)
+     * [Cluster und Pod-Cidr anzeigen](kubernetes-networks/calico/show-cluster-and-pod-cidr.md)
 
   1. FAQs
      * [Diverse FAQs](faq.md)
