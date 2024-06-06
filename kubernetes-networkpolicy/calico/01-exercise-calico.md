@@ -79,8 +79,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: svc-nginx
-  labels:
-    run: svc-my-nginx
 spec:
   type: ClusterIP
   ports:
@@ -141,7 +139,7 @@ kubectl run -it --rm access --image=busybox
 wget -O - http://www.google.de
 
 # sollte nicht funktionieren
-wget -O - http://my-nginx
+wget -O - http://svc-nginx
 ```
 
 ## Step 4: Traffic erlauben für nginx 
