@@ -20,7 +20,7 @@
      * [Example tcproute Kong](gateway-api/kong/02-tcprouting-example.md)
      * [Example tcproute with Cert Manager and Kong](cert-manager/install-and-usage-example-with-kong.md)
      * [Example http->https redirect](gateway-api/kong/03-kong-http-https-redirect.md)
-     * 
+     * [Problem Implementation http -> https redirect kong gateway api](gateway-api/kong/04-problem-implementation-redirect-http-https.md)
     
   1. Kubernetes Storage
      * [Storage mit CSI anbinden](kubernetes-csi/nfs-exercise.md)
