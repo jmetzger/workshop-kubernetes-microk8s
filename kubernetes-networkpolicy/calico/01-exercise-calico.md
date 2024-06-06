@@ -151,7 +151,7 @@ kind: NetworkPolicy
 metadata:
   name: allow-nginx-ingress
 spec:
-  selector: run == 'my-nginx'
+  selector: web == 'my-nginx'
   types:
   - Ingress
   ingress:
