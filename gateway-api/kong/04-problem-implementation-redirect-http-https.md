@@ -1,4 +1,4 @@
-# Problems implentation
+# Problems implementation
 
 ## It should be like this (gateway api - spec)
 
