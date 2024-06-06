@@ -4,12 +4,12 @@
 
 ```
 # show the cluster-cidr used 
-kubectl ippools -o yaml 
+kubectl get ippools -o yaml 
 ```
 
 ## pod-cdir 
 
 ```
-kubectl ipamblocks -o yaml | less
-kubectl ipamblicks -o yaml > myblocks  
+kubectl get ipamblocks -o yaml | less
+kubectl get ipamblicks -o yaml > myblocks  
 ```
