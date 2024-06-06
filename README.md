@@ -28,6 +28,7 @@
      * [Image-Version eines Pod/Deployments rausfinden z.B. metallb](find-version-image.md)
      * [Manifests mit dry-run ausgeben/erstellen](/tipps-tricks/create-manifest-with-dry-run.md)
      * [Pods gleichmäßig auf Nodes verteilen](tipps-tricks/pod-auf-nodes-gleichmaessig-verteilen.md)
+     * [Pods verteilen mit descheduler - d.h. evicten - Alpha](tipps-tricks/descheduler.md)
     
   1. Kubernetes Networking Tipps & Tricks
      * [Debug Pod für Pod starten](/kubernetes-networks/debug-container.md)
