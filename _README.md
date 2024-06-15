@@ -2,6 +2,55 @@
 
 
 ## Agenda
+  1. microk8s
+     * [Cluster-CIDR ändern (so bitte nicht)](#cluster-cidr-ändern-so-bitte-nicht)
+     * [Cluster-CIDR und Service-CIDR bei Installation](#cluster-cidr-und-service-cidr-bei-installation)
+
+  1. metallb / services / ingress
+     * [Ingress vs. Service](#ingress-vs-service)
+     * [Install Ingress without Service LoadBalancer](#install-ingress-without-service-loadbalancer)
+    
+  1. Gateway API
+     * [Overview](#overview)
+     * [Implementations](#implementations)
+     * [Conformance Report - What is implemented in which software](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports)
+     * [Example httproute Nginx](#example-httproute-nginx)
+     * [Example httproute Traefik](#example-httproute-traefik)
+     * [Example httproute Kong](#example-httproute-kong)
+     * [Example tcproute Kong](#example-tcproute-kong)
+     * [Example tcproute with Cert Manager and Kong](#example-tcproute-with-cert-manager-and-kong)
+     * [Example http->https redirect](#example-http->https-redirect)
+     * [Problem Implementation http -> https redirect kong gateway api](#problem-implementation-http-->-https-redirect-kong-gateway-api)
+    
+  1. Kubernetes Storage
+     * [Storage mit CSI anbinden](#storage-mit-csi-anbinden)
+    
+  1. Kubernetes Tipps & Tricks
+     * [Hängenden / nicht löschbaren Namespace beenden](#hängenden--nicht-löschbaren-namespace-beenden)
+     * [Image-Version eines Pod/Deployments rausfinden z.B. metallb](#image-version-eines-poddeployments-rausfinden-zb-metallb)
+     * [Manifests mit dry-run ausgeben/erstellen](#manifests-mit-dry-run-ausgebenerstellen)
+     * [Pods gleichmäßig auf Nodes verteilen](#pods-gleichmäßig-auf-nodes-verteilen)
+     * [Pods verteilen mit descheduler - d.h. evicten - Alpha](#pods-verteilen-mit-descheduler---dh-evicten---alpha)
+    
+  1. Kubernetes Networking Tipps & Tricks
+     * [Debug Pod für Pod starten](#debug-pod-für-pod-starten)
+
+  1. Kubernetes CRD's
+     * [Kubernetes CRD's](#kubernetes-crd's)
+    
+  1. Networking -> Calico
+     * [Welcher Routing-Mode wird verwendet](#welcher-routing-mode-wird-verwendet)
+     * [Cluster und Pod-Cidr anzeigen](#cluster-und-pod-cidr-anzeigen)
+
+  1. NetworkPolicies -> Calica
+     * [Calico only within Namespace](#calico-only-within-namespace)
+     * [Calico only within Namespace](#calico-only-within-namespace)
+
+  1. FAQs
+     * [Diverse FAQs](#diverse-faqs)
+
+## Backlog 
+
   1. Kubernetes - Überblick
      * [Aufbau Allgemein](#aufbau-allgemein)
      * [Structure Kubernetes Deep Dive](https://github.com/jmetzger/training-kubernetes-advanced/assets/1933318/1ca0d174-f354-43b2-81cc-67af8498b56c)
@@ -195,6 +244,1810 @@
 
 
 <div class="page-break"></div>
+
+## microk8s
+
+### Cluster-CIDR ändern (so bitte nicht)
+
+
+### Node 1: Steps are a bit different  on first node 
+
+  * You could also do it on node2 oder node3
+  * It does not need to be node1 
+
+#### Step 1.1 Delete 
+
+```
+## Delete default-ippool
+kubectl delete ippool default-ipv4-ippool
+```
+
+#### Step 1.2 Adjust cni-config 
+
+  * Essentially settings for daemonset calico-node 
+
+```
+## adjust cni - config
+## We we will adjust the part where the calico-node
+## daemonset is created
+vi /var/snap/microk8s/current/args/cni-network/cni.yaml
+```
+
+```
+## Search for IPV4
+ - name: CALICO_IPV4POOL_CIDR
+   value: "10.1.0.0/16"
+
+## Replace with your CIDR
+ - name: CALICO_IPV4POOL_CIDR
+   value: "192.168.0.0/16"
+```
+
+```
+## Important so a new daemonset using the new ippool, will get created 
+kubectl apply -f /var/snap/microk8s/current/args/cni-network/cni.yaml  
+## Check if ippool holds the new ip-range 
+kubectl get ippool -o yaml 
+```
+
+### Step 1.3 change settings for kube-proxy 
+
+```
+vi /var/snap/microk8s/current/kube-proxy
+```
+
+```
+## replace 
+--cluster-cidr=10.1.0.0/16
+## with
+--cluster-cidr=192.168.0.0/16
+```
+
+#### Step 1.4 Restart microk8s and check 
+
+```
+microk8s stop
+microk8s start
+microk8s status
+
+## check pods
+## Some system-pods might still hold old ip's 
+kubectl get pods -A -o wide
+
+## !! You need to redeploy your application pods
+```
+
+### Node 2
+
+#### Step 1.1 Adjust cni-config (only to have the same config there for later)
+
+  * Essentially settings for daemonset calico-node 
+
+```
+## adjust cni - config
+## We we will adjust the part where the calico-node
+## daemonset is created
+vi /var/snap/microk8s/current/args/cni-network/cni.yaml
+```
+
+```
+## Search for IPV4
+ - name: CALICO_IPV4POOL_CIDR
+   value: "10.1.0.0/16"
+
+## Replace with your CIDR
+ - name: CALICO_IPV4POOL_CIDR
+   value: "192.168.0.0/16"
+```
+
+### Step 1.2 change settings for kube-proxy 
+
+```
+vi /var/snap/microk8s/current/kube-proxy
+```
+
+```
+## replace 
+--cluster-cidr=10.1.0.0/16
+## with
+--cluster-cidr=192.168.0.0/16
+```
+
+#### Step 1.3 Restart microk8s and check 
+
+```
+microk8s stop
+microk8s start
+microk8s status
+
+## check pods
+## Some system-pods might still hold old ip's 
+kubectl get pods -A -o wide
+```
+
+### Node 3 
+
+#### Step 1.1 Adjust cni-config (only to have the same config there for later)
+
+  * Essentially settings for daemonset calico-node 
+
+```
+## adjust cni - config
+## We we will adjust the part where the calico-node
+## daemonset is created
+vi /var/snap/microk8s/current/args/cni-network/cni.yaml
+```
+
+```
+## Search for IPV4
+ - name: CALICO_IPV4POOL_CIDR
+   value: "10.1.0.0/16"
+
+## Replace with your CIDR
+ - name: CALICO_IPV4POOL_CIDR
+   value: "192.168.0.0/16"
+```
+
+### Step 1.2 change settings for kube-proxy 
+
+```
+vi /var/snap/microk8s/current/kube-proxy
+```
+
+```
+## replace 
+--cluster-cidr=10.1.0.0/16
+## with
+--cluster-cidr=192.168.0.0/16
+```
+
+#### Step 1.3 Restart microk8s and check 
+
+```
+microk8s stop
+microk8s start
+microk8s status
+
+## check pods
+## Some system-pods might still hold old ip's 
+kubectl get pods -A -o wide
+```
+
+### Cluster-CIDR und Service-CIDR bei Installation
+
+ 
+### Step 1: Setup /etc/microk8s.yaml on node 
+
+#### With persistent cluster token 
+
+  * Makes it possible to always use the same token
+
+```
+---
+version: 0.2.0
+persistentClusterToken: "a74cddf30d2408d49fcd748a26021c6a"
+join:
+## adjust x to your ip
+  url: "10.135.0.x:25000/a74cddf30d2408d49fcd748a26021c6a"   
+extraCNIEnv:
+  IPv4_CLUSTER_CIDR: "172.18.0.0/16"
+  IPv4_SERVICE_CIDR: "172.17.0.0/24"
+extraSANs:
+  - 172.17.0.1
+addons:
+  - name: dns
+  - name: rbac
+```
+
+
+### Step 2: Installieren von microk8s 
+
+  * Wenn einer fehler in der config ist, installiert er nicht ! (Das ist gut)
+
+```
+snap install microk8s --classic 
+```
+
+#### Step 3: Wiederholen für weitere Nodes 
+
+  * Schritt 1+2 wiederholen für alle weiteren Nodes 
+
+
+#### Troubleshooten (Variante 1) 
+
+  * In einem Fall hatte ich die falsche IP in /etc/microk8s.yaml eingetragen
+  * Ich habe diese geändert und dann ein:
+  * snap set microk8s config="$(cat /etc/microk8s.yaml)"
+  * Er hat das dann nochmal neu eingelesen und durchgeführt 
+
+#### Troubleshooten (Variante 2) 
+
+  * Sollte es wider Erwarten nicht funktionieren:
+
+```
+1. Nochmal die /etc/microk8s.yaml überprüfen
+2. microk8s nochmal komplett deinstallieren:
+snap remove microk8s --purge
+3. Nochmal neu installieren 
+snap install microk8s --classic 
+```
+
+#### Überprüfen von service-cidr und pod-cidr auf dem system 
+
+  * Ist alles richtig eingetragen
+  * Konfigurationen werden in microk8s alle unter /var/snap/microk8s/current/args gespeichert
+
+```
+## Das einfachste ist anhand der IP - Range danach zu greppen
+cd /var/snap/microk8s/current/args
+grep -r "172.17." .
+grep -r "172.18." . 
+```
+
+### Reference: 
+
+ *  https://github.com/canonical/microk8s-cluster-agent/blob/main/pkg/k8sinit/testdata/schema/full.yaml
+
+## metallb / services / ingress
+
+### Ingress vs. Service
+
+
+### Variante mit Service (externe IP pro Service)
+
+![image](https://github.com/jmetzger/workshop-kubernetes-microk8s/assets/1933318/dcbb5eeb-fc60-4cc4-95b2-a77706450016)
+
+
+### Variante mit Service und vorgelagert Ingress (externe IP nur für Ingress)
+
+![image](https://github.com/jmetzger/workshop-kubernetes-microk8s/assets/1933318/eed0d003-6856-43a2-9682-6a0aa4d59d4d)
+
+### Install Ingress without Service LoadBalancer
+
+
+### Why ?
+
+  * We want to use service on our own (own manifest) for specific settings metallb (ippool a.s.o)
+
+### Walkthrough 
+
+```
+cd
+mkdir -p manifests
+cd manifests
+mkdir ingress
+cd ingress
+vi values.yml
+```
+
+```
+controller:
+  service:
+    enabled: false
+    external:
+      enabled: true
+```
+
+```
+helm install nginx-ingress ingress-nginx/ingress-nginx -f values.yml --namespace ingress helm install nginx-ingress ingress-nginx/ingress-nginx --namespace ingress
+```
+
+## Gateway API
+
+### Overview
+
+
+### Features 
+
+  * Responsibility separation
+  * TrafficRouting based on RequestHeader / Environment Variable 
+  * LoadBalancing (Gewichtung: 10% an Service 1, 90% an Service 2) 
+  * TCP und gRPC-Routing 
+
+### Komponenten 
+
+  1. GatewayController (Kong, Nginx, Traefik, HAProxy, Istio) - Software
+  1. GatewayClass (Stable)
+  1. Gateway (Stable) 
+  1. HttpRoute (GA) / TCPRoute (experimentell) / gRPCRoute (experimentell) 
+
+### Shared responsibility 
+
+#### Gateway API can be split into different responsibility roles
+
+![Hallo](images/resource-model.png)
+
+#### Reference 
+
+  * https://gateway-api.sigs.k8s.io/
+
+### Implementations
+
+
+### Kong 
+
+  * Ref: https://github.com/kong/kubernetes-ingress-controller
+
+### Nginx 
+
+  * Ref: https://github.com/nginxinc/nginx-gateway-fabric
+
+### Traefik 
+
+  * Important: Traefik currently only partly supports spec v1.0.0
+  * Currently: v1.1.0 from Kubernetes is alreay out
+
+```
+## Please do not use Traefik right now for the gateway api
+```
+
+### Reference:
+
+  * https://gateway-api.sigs.k8s.io/implementations/
+
+### Conformance Report - What is implemented in which software
+
+  * https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports
+
+### Example httproute Nginx
+
+
+### Voraussetzung
+  * Gateway API CRD's & Nginx Fabric Gateway müssen installiert sein
+  * siehe [Installation nginx](/gateway-api/installation/nginx.md)
+
+### Schritt 1: Gateway Api Ressources installieren 
+
+```
+## Standard - Stabile Features 
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/standard-install.yaml
+
+## Es gibt auch einen experimentellen Channel, der aber anders installiert werden muss
+## MACHEN WIR NICHT 
+## kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/experimental-install.yaml
+```
+
+### Schritt 2: nginx fabric gateway mit helm installieren 
+
+```
+helm install ngf oci://ghcr.io/nginxinc/charts/nginx-gateway-fabric --create-namespace -n nginx-gateway
+```
+
+### Schritt 3: Gateway aufsetzen (Beispiel mit nginx) 
+
+  * An dieses Gateway kann ich nur Routen im gleichen Namespace anhängen
+
+```
+cd
+mkdir -p manifests
+cd manifests
+mkdir -p gateway-nginx-simple 
+cd gateway-nginx-simple
+```
+
+```
+vi 01-gateway.yml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: prod-web
+spec:
+  gatewayClassName: nginx
+  listeners:
+  - protocol: HTTP
+    port: 80
+    name: prod-web-gw
+    allowedRoutes:
+      namespaces:
+        from: Same
+```
+
+```
+kubectl apply -f .
+```
+
+### Schritt 4: HTTP-Route definieren 
+
+```
+vi 02-httproute.yml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: apple-http-route
+spec:
+  parentRefs:
+  - name: prod-web
+  rules:
+  - backendRefs:
+    - name: apple-service
+      port: 80
+
+```
+
+```
+kubectl apply -f .
+```
+
+### Schritt 4: Service und Pod / Deployment definieren 
+
+```
+vi 03-apple-pod.yml
+```
+
+```
+## apple.yml 
+## vi apple.yml 
+kind: Pod
+apiVersion: v1
+metadata:
+  name: apple-app
+  labels:
+    app: apple
+spec:
+  containers:
+    - name: apple-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=apple"
+```
+
+```
+vi 04-service.yml
+```
+
+```
+kind: Service
+apiVersion: v1
+metadata:
+  name: apple-service
+spec:
+  selector:
+    app: apple
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5678 # Default port for image
+```
+
+```
+kubectl apply -f .
+```
+
+### Use specific IP for metallb 
+
+```
+vi values.yaml 
+```
+
+```
+service:
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: 164.92.141.176
+```
+
+```
+helm upgrade ngf oci://ghcr.io/nginxinc/charts/nginx-gateway-fabric -n nginx-gateway -f values.yaml
+kubectl -n nginx-gateway get svc 
+```
+
+
+### Reference: 
+
+  * https://github.com/nginxinc/nginx-gateway-fabric
+  * https://docs.nginx.com/nginx-gateway-fabric/installation/expose-nginx-gateway-fabric/
+
+  * https://gateway-api.sigs.k8s.io/guides/simple-gateway/
+
+
+### Example httproute Traefik
+
+
+### Important 
+
+```
+## As of 01.06.2024, the support for gateway api is currently experimental
+## Feature of Gateway API v1.0.0 are only supported partly
+```
+
+### Prerequisites 
+
+  * You need to have LoadBalancers in your clusters
+  * In our case, we used Metallb with DigitalOcean
+    * [Metallb installieren](metallb/metallb-helm-l2-aufsetzen.md)
+   
+### Step 1: Install (we are doing this all in our default namespace)
+
+```
+## gateway and httproute need to be in the same namespace by default
+```
+
+```
+## Important you need to activated the experimenal gateway api provider
+## Information in some places in unfortunately not complete / correct 
+```
+
+```
+helm repo add traefik https://traefik.github.io/charts
+helm install traefik --set experimental.kubernetesGateway.enabled=true traefik/traefik --version 28.2.0
+## This installs the gatewayclass and the gateway
+```
+
+### Step 2: Setup a test project (deploy and service) 
+
+```
+mkdir -p manifests
+cd manifests
+mkdir traefik-sample
+cd traefik-sample
+```
+
+```
+vi 01-whoami-deploy-and-service.yml
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whoami
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: whoami
+  template:
+    metadata:
+      labels:
+        app: whoami
+    spec:
+      containers:
+        - name: whoami
+          image: traefik/whoami:v1.6.0
+          ports:
+            - containerPort: 80
+              name: http
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whoami
+spec:
+  selector:
+    app: whoami
+
+  ports:
+    - port: 80
+      targetPort: http
+
+```
+
+```
+kubectl apply -f .
+```
+
+### Step 3: Setup httproute 
+
+```
+vi 02-httproute.yaml 
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-app-1
+  namespace: default
+
+spec:
+  parentRefs:
+  - name: traefik-gateway
+
+  rules:
+  - backendRefs:
+    - name: whoami
+      port: 80
+```
+
+```
+kubectl apply -f .
+```
+
+### Step 4: Testit  
+
+```
+## Find the External ip in the browser
+kubectl get svc traefik 
+```
+
+```
+## output
+NAME      TYPE           CLUSTER-IP    EXTERNAL-IP       PORT(S)                      AGE
+traefik   LoadBalancer   172.17.0.36   157.230.113.124   80:31491/TCP,443:32010/TCP   55m
+```
+
+```
+## open in your favourite browser
+## you should see the whoami page now 
+http://157.230.113.124/
+```
+
+### Entrypoints 
+
+```
+## Gateway uses entrypoints, which need to be configured in
+## So the easiest way, would be to use exactly these entrypoints
+## Default entrypoint for web: 8000
+## (Although opened to the outside world with 80)
+kubectl get gateway traefik-gateway -o yaml 
+```
+
+```
+## output
+kind: Gateway
+  name: traefik-gateway
+  namespace: default
+spec:
+  gatewayClassName: traefik
+  listeners:
+  - allowedRoutes:
+      namespaces:
+        from: Same
+    name: web
+    port: 8000
+    protocol: HTTP
+```
+
+```
+## How can find out which entrypoints are opened in traeffik
+kubectl describe deploy/traefik | grep -A 20 "Args:"
+```
+
+```
+## Output
+Args:
+      --global.checknewversion
+      --global.sendanonymoususage
+      --entryPoints.metrics.address=:9100/tcp
+      --entryPoints.traefik.address=:9000/tcp
+      --entryPoints.web.address=:8000/tcp
+      --entryPoints.websecure.address=:8443/tcp
+      --api.dashboard=true
+      --ping=true
+      --metrics.prometheus=true
+      --metrics.prometheus.entrypoint=metrics
+      --providers.kubernetescrd
+      --providers.kubernetesingress
+      --providers.kubernetesgateway
+      --experimental.kubernetesgateway
+      --entryPoints.websecure.http.tls=true
+      --log.level=INFO
+```
+
+### Investigate 
+
+  * If you want to investigage how everyhing is tied together look here:
+
+```
+helm pull traefik/traefik
+tar xzvf traefik*.tar.gz
+cd traefik/templates
+cat gateway.yaml
+cat gatewayclass.yaml
+```
+
+### Example httproute Kong
+
+
+### Step 1: Install CRD's for Gateway API 
+
+```
+cd
+mkdir -p manifests
+cd manifests
+mkdir -p kong-gateway
+cd kong-gateway
+```
+
+```
+wget -O 00-gateway-api-standard-1.1.0.yml https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/standard-install.yaml
+kubectl apply -f 00-gateway-api-standard-1.1.0.yml
+```
+
+### Step 2: Install kong with helm 
+
+```
+helm repo add kong https://charts.konghq.com
+helm install kong kong/kong --namespace kong --create-namespace
+## Verify that listen is setup
+kubectl -n kong get svc kong-kong-proxy
+```
+
+
+#### Step 3: Setup Gateway Class for Kong 
+
+```
+vi 01-gatewayclass.yml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: kong
+  annotations:
+    konghq.com/gatewayclass-unmanaged: 'true'
+
+spec:
+  controllerName: konghq.com/kic-gateway-controller
+```
+
+```
+kubectl apply -f .
+```
+
+#### Step 4: Setup Gateway for your project 
+
+```
+vi 02-gateway.yml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: prod-web-kong
+spec:
+  gatewayClassName: kong
+  listeners:
+  - protocol: HTTP
+    port: 80
+    name: prod-web-gw
+    allowedRoutes:
+      namespaces:  
+        from: Same
+```
+
+#### Step 5: Setup httproute for gateway
+
+```
+vi 03-http-route.yml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: apple-http-route
+spec:
+  parentRefs:
+  - name: prod-web-kong
+  rules:
+  - backendRefs:
+    - name: apple-service-kong
+      port: 80
+```
+
+```
+kubectl apply -f .
+```
+
+#### Step 6: Setup apple-pod and apple-service 
+
+```
+vi apple-pod.yml 
+```
+
+```
+## apple.yml
+## vi apple.yml
+kind: Pod
+apiVersion: v1
+metadata:
+  name: apple-app-kong
+  labels:
+    app: apple-kong
+spec:
+  containers:
+    - name: apple-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=apple"
+```
+
+```
+kubectl apply -f .
+```
+
+```
+vi 05-apple-service.yml
+```
+
+```
+## apple.yml
+kind: Service
+apiVersion: v1
+metadata:
+  name: apple-service-kong
+spec:
+  selector:
+    app: apple-kong
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5678 # Default port for image
+```
+
+
+```
+kubectl apply -f .
+```
+
+#### Step 7: Test it 
+
+```
+## Find out the public ip
+kubectl -n kong get svc kong-gateway
+```
+
+```
+## In your browser open
+## this ip from above
+```
+
+#### Reference / Get Started 
+
+  * https://github.com/kong/kubernetes-ingress-controller
+  * https://gateway-api.sigs.k8s.io/guides/simple-gateway/
+
+### Example tcproute Kong
+
+
+### Prerequisites: 
+ 
+  * Remove helm chart for ingress if present : helm -n kong uninstall kong (if ingress was installed as kong) 
+  * kong - chart is installed
+    * https://artifacthub.io/packages/helm/kong/kong
+    * and a service runs for kong-gateway runs in kong - namespace
+
+### Step 1: Setup experimental crds 
+ 
+
+```
+cd
+mkdir -p manifests
+cd manifests
+mkdir -p kong-gateway-tcp
+cd kong-gateway-tcp
+mkdir api
+cd api
+```
+
+```
+wget -O gateway-api-1.1.0-experimental.yml https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.1.0/experimental-install.yaml
+kubectl apply -f .
+```
+
+#### Step 2: setup kong 
+
+
+```
+vi kong-values.yml
+```
+
+```
+proxy:
+  stream:
+    - containerPort: 9000
+      servicePort: 9000
+      protocol: TCP
+```
+
+```
+helm repo add kong https://charts.konghq.com
+helm install kong kong/kong -f kong-values.yml --namespace kong --create-namespace
+```
+
+```
+## Verify that listen is setup
+kubectl -n kong get svc kong-kong-proxy
+kubectl -n kong describe deploy kong-kong | grep KONG_STREAM_LISTEN
+```
+
+### Step 3: Setup gatewayclass 
+
+```
+vi 01-gatewayclass.yml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: kong
+  annotations:
+    konghq.com/gatewayclass-unmanaged: 'true'
+
+spec:
+  controllerName: konghq.com/kic-gateway-controller
+```
+
+### Step 4: Beispiel echo-service 
+
+```
+wget -O 02-echo-service.yaml https://docs.konghq.com/assets/kubernetes-ingress-controller/examples/echo-service.yaml
+cat 02-echo-service.yaml
+kubectl apply -f 02-echo-service.yaml 
+```
+
+### Step 5: Test it locally 
+
+```
+kubectl get svc echo
+## show the ports e.g. 1025
+kubectl run -it --rm podtester --image=busybox
+```
+
+```
+telnet echo 1025
+## you can write something and will get it back
+hello you, Jochen
+hello you, Jochen
+```
+
+```
+CRTL + C
+e
+```
+
+### Step 6: Setup gateway 
+
+```
+vi 03-gateway.yml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: prod-stream-9000
+spec:
+  gatewayClassName: kong
+  listeners:
+  - protocol: TCP
+    port: 9000
+    name: stream9000
+```
+
+```
+kubectl apply -f .
+kubectl get gateway prod-stream-9000
+```
+
+### Step 7: Setup tcprouting 
+
+```
+vi 04-tcprouting.yaml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: echo-plaintext
+spec:
+  parentRefs:
+  - name: prod-stream-9000
+    sectionName: stream9000
+  rules:
+  - backendRefs:
+    - name: echo
+      port: 1025
+```
+
+```
+kubectl apply -f .
+```
+
+### Step 8: Verify 
+
+#### Verification 1:
+
+```
+## Is there a status ?
+kubectl describe tcproute echo-plaintext
+
+## If there is not status.....
+## -> Objekt is in etcd -> BUT: it is not processed by Kong
+```
+
+### Step 9: Fix 
+
+```
+## We are using an alpha - feature, and need to enable these alpha - features in Kong
+https://docs.konghq.com/kubernetes-ingress-controller/latest/reference/feature-gates/
+```
+
+```
+## Version 1: Just for testing
+kubectl set env -n kong deployment/kong-kong CONTROLLER_FEATURE_GATES="GatewayAlpha=true" -c ingress-controller
+```
+
+```
+## Version 2: Set it correctly in your kong-values.yaml file and upgrade
+### add the following lines
+ingressController:
+  env:
+    feature_gates: GatewayAlpha=true
+```
+
+```
+### i have not tested this yet
+helm -n kong upgrade kong kong/kong -f kong-values.yml 
+```
+
+### Step 10: Retest 
+
+```
+kubectl -n kong describe tcproute echo-plaintext
+kubectl get tcproute echo-plaintext -ojsonpath='{.status.parents[0].conditions[?(@.reason=="Accepted")]}'
+```
+
+### Step 11: Test connection 
+
+```
+## You should get the public ip from here 
+kubectl -n kong get svc 
+## on your local machine our linux-client
+telnet <public-ip-of-kong-proxy> 9000 
+
+## now you can write something and
+## and it will get returned back 
+```
+
+### Reference 
+
+  * https://docs.konghq.com/kubernetes-ingress-controller/3.1.x/guides/services/tcp/
+  * https://gateway-api.sigs.k8s.io/guides/tcp/
+
+### Example tcproute with Cert Manager and Kong
+
+
+### Step 1: Install Cert Manager 
+
+```
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.5/cert-manager.crds.yaml
+### Add the Jetstack Helm repository
+helm repo add jetstack https://charts.jetstack.io
+
+### Install the cert-manager helm chart
+helm install cert-manager --namespace cert-manager --create-namespace --version v1.14.5 jetstack/cert-manager
+
+```
+
+### Step 2: Create token for digitalocean 
+
+```
+## You can create your token here
+https://cloud.digitalocean.com/account/api/tokens/new
+
+## now you need to encode it
+echo -n 'your-access-token' | base64
+```
+
+### Step 2.5: Subdomains einrichten in digitalocean - dns 
+
+```
+TBD 
+```
+
+### Step 3: Create secret based on that 
+
+```
+cd
+mkdir -p manifests
+cd manifests
+mkdir ssl
+cd ssl
+```
+
+```
+vi 01-secret.yml
+```
+
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: digitalocean-dns
+data:
+  # insert your DO access token here
+  access-token: "base64 encoded access-token here"
+```
+
+```
+kubectl -n cert-manager apply -f .
+```
+
+### Step 4: Create an clusterissuer (works across all namespaces) 
+
+```
+vi 02-clusterissuer.yml
+```
+
+```
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod-issuer
+spec:
+  acme:
+    email: some@domain.de
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - selector:
+        dnsZones:
+          - "do.t3isp.de"
+      dns01:
+        digitalocean:
+          tokenSecretRef:
+            name: digitalocean-dns
+            key: access-token
+```
+
+```
+kubectl apply -f .
+```
+
+### Step 5: manifests for certificate (wildcard) 
+
+```
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: le-crt
+spec:
+  secretName: tls-secret
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod-issuer
+  commonName: "*.app1.do.t3isp.de"
+  dnsNames:
+    - "*.app1.do.t3isp.de"
+```
+
+```
+kubectl apply -f .
+```
+
+### Step 6: check if certificate was created 
+
+```
+kubectl get certificates
+kubectl describe certificates let-cert 
+kubectl get secret tls-secret -o yaml 
+```
+
+### Step 7: Setup gateway with https 
+
+```
+vi 04-gateway.yml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: prod-https-kong
+spec:
+  gatewayClassName: kong
+  listeners:
+  - protocol: HTTPS
+    port: 443
+    name: prod-https-gw
+    hostname: "jochen.app1.do.t3isp.de"
+    tls:
+      certificateRefs:
+      - kind: Secret
+        name: tls-secret
+    allowedRoutes:
+      namespaces:
+        from: Same
+```
+
+```
+kubectl apply -f .
+```
+
+```
+vi 05-http-routes.yml
+```
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+ name: apple-https-route
+spec:
+  parentRefs:
+  - name: prod-https-kong
+  hostnames:
+  - jochen.app1.do.t3isp.de
+  rules:
+  - backendRefs:
+    - name: apple-service-kong
+      port: 80
+```
+
+```
+kubectl apply -f .
+```
+
+#### Step 8: Test in browser
+
+```
+https://jochen.app1.t3isp.de
+```
+
+
+### Reference 
+  * https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-with-cert-manager-on-digitalocean-kubernetes
+  * Problem fix: https://www.digitalocean.com/community/questions/how-do-i-correct-a-connection-timed-out-error-during-http-01-challenge-propagation-with-cert-manager
+  * Question: Do we have the same problem wiht metallb
+  * https://cert-manager.io/docs/configuration/acme/dns01/digitalocean/
+  * https://artifacthub.io/packages/helm/cert-manager/cert-manager
+
+### Example http->https redirect
+
+
+### You have to set that in httproute 
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+ name: apple-https-route
+ annotations:
+   konghq.com/protocols: "https"
+   konghq.com/https-redirect-status-code: "302"
+spec:
+  parentRefs:
+  - name: prod-https-kong
+  hostnames:
+  - gimmeyourapple.app6.do.t3isp.de
+  rules:
+  - backendRefs:
+    - name: apple-service-kong
+      port: 80
+
+
+```
+
+### Problem Implementation http -> https redirect kong gateway api
+
+
+### It should be like this (gateway api - spec)
+
+  * https://gateway-api.sigs.k8s.io/guides/http-redirect-rewrite/#http-to-https-redirects
+
+### But in kong it needs to be done like this (and only works like this) 
+
+  * https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/services/https-redirect/
+
+### The reason: Redirect is not yet implemented in Kong 
+
+  * https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/kong-kubernetes-ingress-controller/v3.1.1-report.yaml
+
+## Kubernetes Storage
+
+### Storage mit CSI anbinden
+
+
+### Step 1: Treiber installieren 
+
+  * https://github.com/kubernetes-csi/csi-driver-nfs/blob/master/docs/install-csi-driver-v4.6.0.md
+
+```
+curl -skSL https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/v4.6.0/deploy/install-driver.sh | bash -s v4.6.0 --
+```
+
+### Step 2: Storage Class 
+
+```
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-csi
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: 10.135.0.67
+  share: /var/nfs/tln1
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+mountOptions:
+  - nfsvers=3
+```
+
+### Step 3: Persistent Volume Claim 
+
+```
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-nfs-dynamic
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: nfs-csi
+```
+
+### Step 4: Pod 
+
+```
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nginx-nfs
+spec:
+  containers:
+    - image: nginx:1.23
+      name: nginx-nfs
+      command:
+        - "/bin/bash"
+        - "-c"
+        - set -euo pipefail; while true; do echo $(date) >> /mnt/nfs/outfile; sleep 1; done
+      volumeMounts:
+        - name: persistent-storage
+          mountPath: "/mnt/nfs"
+          readOnly: false
+  volumes:
+    - name: persistent-storage
+      persistentVolumeClaim:
+        claimName: pvc-nfs-dynamic
+```
+
+
+### Reference:
+
+ * https://rudimartinsen.com/2024/01/09/nfs-csi-driver-kubernetes/
+
+## Kubernetes Tipps & Tricks
+
+### Hängenden / nicht löschbaren Namespace beenden
+
+
+```
+kubectl get namespace "metallb-system" -o json   | tr -d "\n" | sed "s/\"finalizers\": \[[^]]\+\]/\"finalizers\": []/"  | kubectl replace --raw /api/v1/namespaces/metallb-system/finalize -f -
+```
+
+### Image-Version eines Pod/Deployments rausfinden z.B. metallb
+
+
+```
+kubectl -n metallb-system describe pods metallb-controller-665d96757f-whwrm
+kubectl -n metallb-system describe pods metallb-controller-665d96757f-whwrm | grep -i "image:"
+```
+
+```
+kubectl -n metallb-system get deploy metallb-controller -o yaml
+```
+
+### Manifests mit dry-run ausgeben/erstellen
+
+
+```
+kubectl run podtest --dry-run=client --image=nginx -o yaml
+```
+
+### Pods gleichmäßig auf Nodes verteilen
+
+
+
+  * https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+
+### Pods verteilen mit descheduler - d.h. evicten - Alpha
+
+
+### Policy, die nach Installation des helm - charts eingerichtet werden muss 
+
+  * Als Möglichkeit: Low Node Utilization 
+  * https://github.com/kubernetes-sigs/descheduler?tab=readme-ov-file#lownodeutilization
+
+```
+apiVersion: "descheduler/v1alpha2"
+kind: "DeschedulerPolicy"
+profiles:
+  - name: ProfileName
+    pluginConfig:
+    - name: "LowNodeUtilization"
+      args:
+        thresholds:
+          "cpu" : 20
+          "memory": 20
+          "pods": 20
+        targetThresholds:
+          "cpu" : 50
+          "memory": 50
+          "pods": 50
+    plugins:
+      balance:
+        enabled:
+          - "LowNodeUtilization"
+```
+
+### Ref:
+
+  * https://github.com/kubernetes-sigs/descheduler
+  * https://artifacthub.io/packages/helm/descheduler/descheduler
+
+## Kubernetes Networking Tipps & Tricks
+
+### Debug Pod für Pod starten
+
+
+###  Walkthrough  Debug Container 
+
+```
+## Show that is does not work 
+kubectl run ephemeral-demo --image=registry.k8s.io/pause:3.1 --restart=Never
+kubectl exec -it ephemeral-demo -- sh
+
+## Start a debug container 
+kubectl debug -it ephemeral-demo --image=busybox 
+```
+
+### Walkthrough Debug Node 
+
+```
+kubectl get nodes 
+kubectl debug node/mynode -it --image=ubuntu
+```
+
+
+
+### Reference 
+
+  * https://kubernetes.io/docs/tasks/debug/debug-application/debug-running-pod/#ephemeral-container
+
+## Kubernetes CRD's
+
+### Kubernetes CRD's
+
+
+### Create our own crd 
+
+#### Step 1:
+
+```
+cd
+mkdir -p manifests/crds
+cd manifests/crds 
+```
+
+```
+## vi 01-crd.yaml 
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: crontabs.stable.example.com
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: stable.example.com
+  # list of versions supported by this CustomResourceDefinition
+  versions:
+    - name: v1
+      # Each version can be enabled/disabled by Served flag.
+      served: true
+      # One and only one version must be marked as the storage version.
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                cronSpec:
+                  type: string
+                image:
+                  type: string
+                replicas:
+                  type: integer
+  # either Namespaced or Cluster
+  scope: Namespaced
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: crontabs
+    # singular name to be used as an alias on the CLI and for display
+    singular: crontab
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: CronTab
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - ct
+```
+```
+kubectl apply -f
+kubectl api-versions | grep stable
+```
+
+#### Step 2: create custom object ;o) 
+
+```
+## vi 03-crontab.yaml 
+apiVersion: "stable.example.com/v1"
+kind: CronTab
+metadata:
+  name: my-new-cron-object
+spec:
+  cronSpec: "* * * * */5"
+  image: my-awesome-cron-image
+```
+
+```
+kubectl apply -f .
+kubectl get crontab
+kubectl get crontab -o yaml
+```
+
+#### Step 2: new version + old objects still there ?  
+
+```
+## vi 02-crd.yaml 
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: crontabs.stable.example.com
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: stable.example.com
+  # list of versions supported by this CustomResourceDefinition
+  versions:
+    - name: v2
+      # Each version can be enabled/disabled by Served flag.
+      served: true
+      # One and only one version must be marked as the storage version.
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                cronSpec:
+                  type: string
+                image:
+                  type: string
+                replicas:
+                  type: integer
+                remark:
+                  type: string 
+             
+  # either Namespaced or Cluster
+  scope: Namespaced
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: crontabs
+    # singular name to be used as an alias on the CLI and for display
+    singular: crontab
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: CronTab
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - ct
+```
+
+### Take the patch approach (Try 1) 
+
+```
+kubectl patch customresourcedefinitions crontabs.stable.example.com --subresource='status' --type='merge' -p '{"status":{"storedVersions":["v2"]}}'
+kubectl replace -f 02-crd.yaml
+kubectl get crontab 
+```
+
+### Take the good approach (Try 2) 
+
+```
+## go back
+kubectl patch customresourcedefinitions crontabs.stable.example.com --subresource='status' --type='merge' -p '{"status":{"storedVersions":["v1"]}}'
+kubectl replace -f 01-crd.yaml
+## now we can see the again 
+kubectl get crontab 
+```
+
+```
+## get the data
+## eventually you will have this in your version control anyway 
+kubectl get crontab -A -o yaml > all.yaml 
+## this also deletes the corresponding data 
+kubectl delete -f 01-crd.yaml # v1
+kubectl create -f 02-crd.yaml # v2 
+## adjust the version before you apply - we have done this here
+kubectl apply -f 03-crontab.yaml
+```
+
+### Ref:
+
+  * https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
+
+## Networking -> Calico
+
+### Welcher Routing-Mode wird verwendet
+
+
+### Variante: calico in microk8s (z.B.) 
+
+```
+kubectl -n kube-system describe ds calico-node | grep -A 35  calico-node
+## or specific
+kubectl -n kube-system describe ds calico-node | egrep -i -e vxlan  -e cluster_type
+
+```
+
+
+### Variante: vanilla calico (z.B.) 
+
+```
+kubectl -n calico-system describe ds calico-node | grep -A 35  calico-node
+## or specific
+kubectl -n calico-system describe ds calico-node | egrep -i -e vxlan  -e cluster_type
+
+```
+
+```
+Environment:
+      DATASTORE_TYPE:                      kubernetes
+      WAIT_FOR_DATASTORE:                  true
+      CLUSTER_TYPE:                        k8s,operator,bgp
+      CALICO_DISABLE_FILE_LOGGING:         false
+      FELIX_DEFAULTENDPOINTTOHOSTACTION:   ACCEPT
+      FELIX_HEALTHENABLED:                 true
+      FELIX_HEALTHPORT:                    9099
+      NODENAME:                             (v1:spec.nodeName)
+      NAMESPACE:                            (v1:metadata.namespace)
+      FELIX_TYPHAK8SNAMESPACE:             calico-system
+      FELIX_TYPHAK8SSERVICENAME:           calico-typha
+      FELIX_TYPHACAFILE:                   /etc/pki/tls/certs/tigera-ca-bundle.crt
+      FELIX_TYPHACERTFILE:                 /node-certs/tls.crt
+      FELIX_TYPHAKEYFILE:                  /node-certs/tls.key
+      FIPS_MODE_ENABLED:                   false
+      FELIX_TYPHACN:                       typha-server
+      CALICO_MANAGE_CNI:                   true
+      CALICO_IPV4POOL_CIDR:                192.168.0.0/16
+      CALICO_IPV4POOL_VXLAN:               CrossSubnet
+      CALICO_IPV4POOL_BLOCK_SIZE:          26
+      CALICO_IPV4POOL_NODE_SELECTOR:       all()
+      CALICO_IPV4POOL_DISABLE_BGP_EXPORT:  false
+      CALICO_NETWORKING_BACKEND:           bird
+      IP:                                  autodetect
+      IP_AUTODETECTION_METHOD:             first-found
+      IP6:                                 none
+      FELIX_IPV6SUPPORT:                   false
+      KUBERNETES_SERVICE_HOST:             10.96.0.1
+      KUBERNETES_SERVICE_PORT:             443
+    Mounts:
+```
+
+### Cluster und Pod-Cidr anzeigen
+
+
+### ippools 
+
+```
+## show the cluster-cidr used 
+kubectl get ippools -o yaml 
+```
+
+### pod-cdir 
+
+```
+kubectl get ipamblocks -o yaml | less
+kubectl get ipamblicks -o yaml > myblocks  
+```
+
+## NetworkPolicies -> Calica
+
+### Calico only within Namespace
+
+
+```
+---
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: default-deny
+spec:
+  namespaceSelector: kubernetes.io/metadata.name != "kube-system"
+  types:
+  - Ingress
+  - Egress
+  egress:
+   # allow all namespaces to communicate to DNS pods
+  - action: Allow
+    protocol: UDP
+    destination:
+      selector: 'k8s-app == "kube-dns"'
+      ports:
+      - 53
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: 'k8s-app == "kube-dns"'
+      ports:
+      - 53
+---
+## 03-allow-ingress-my-nginx.yml
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-only-from-within-namespace
+  namespace: fromhere
+spec:
+  types:
+  - Ingress
+  - Egress
+  egress:
+  - action: Allow
+  ingress:
+  - action: Allow
+---
+## 03-allow-ingress-my-nginx.yml
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-only-from-within-namespace
+  namespace: np
+spec:
+  types:
+  - Ingress
+  - Egress
+  egress:
+  - action: Allow
+  ingress:
+  - action: Allow
+    source:
+      namespaceSelector: kubernetes.io/metadata.name == "np"
+```
+
+### Calico only within Namespace
+
+## FAQs
+
+### Diverse FAQs
+
+
+### Welcher DNS wird genommen (microk8s)
+
+  * Microk8s verwendet standardmäßig die Nameserver, die auf dem Host-System /etc/resolv.conf eingetragen
+
+```
+By default it forwards requests to the system-defined servers in /etc/resolv.conf for resolving
+addresses. This can be changed when you enable the addon, for example:
+```
+
+  * https://microk8s.io/docs/addon-dns
+
+### Fehler: Nameserver limits were exceeded, some nameservers have been omitted, the applied nameserver line is: 67.207.67.3 67.207.67.2 67.207.67.3
+
+  * Fehler tritt in: calico-node - pods auf kube-system auf. 
+  * https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/#known-issues
+  * Fix ? 
 
 ## Kubernetes - Überblick
 
@@ -938,6 +2791,14 @@ kubectl get deployments -n kube-system
 
 ## wir wollen unseren default namespace ändern 
 kubectl config set-context --current --namespace <dein-namespace>
+```
+
+
+### Was darf ich alles ?
+
+```
+kubectl auth can-i --list
+kubectl auth can-i get nodes
 ```
 
 
