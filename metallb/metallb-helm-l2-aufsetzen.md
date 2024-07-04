@@ -1,6 +1,6 @@
-# Metallb mit helm für L2 aufsetzen (DigitalOcean) 
+# Metallb with helm for L2 - Installation (DigitalOcean) 
 
-## Schritt 1: helm chart installieren 
+## Step 1: helm chart installi 
 
 ```
 helm repo add metallb https://metallb.github.io/metallb
@@ -12,7 +12,7 @@ helm install metallb metallb/metallb --version 0.14.5 --namespace=metallb-system
 kubectl -n metallb-system get pods -o wide 
 ```
 
-## Schritt 2: Addressbereich und Propagation-Art konfigurieren 
+## Step 2: addresspool und Propagation-type (config) 
 
 ```
 cd
@@ -57,7 +57,7 @@ metadata:
 kubectl apply -f .
 ```
 
-## Schritt 3: Testen.. Bekomme ich eine IP vom LoadBalancer ? 
+## Schritt 4: Test do i get an external ip 
 
 ```
 vi 03-deploy.yml
