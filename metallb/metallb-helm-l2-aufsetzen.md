@@ -92,7 +92,6 @@ vi 04-service.yml
 ```
 
 ```
-# 02-svc.yml
 apiVersion: v1
 kind: Service
 metadata:
